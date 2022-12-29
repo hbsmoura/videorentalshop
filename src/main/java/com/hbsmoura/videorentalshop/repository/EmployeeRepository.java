@@ -10,5 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
-    Page<Employee> findByNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(String text, String text1, Pageable pageable);
+    Page<Employee> findByNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(
+            String text, String text1, Pageable pageable
+    );
 }

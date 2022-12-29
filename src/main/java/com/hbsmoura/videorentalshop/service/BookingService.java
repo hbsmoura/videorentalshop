@@ -3,14 +3,8 @@ package com.hbsmoura.videorentalshop.service;
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.enums.EnumBookingState;
 import com.hbsmoura.videorentalshop.exceptions.*;
-import com.hbsmoura.videorentalshop.model.Booking;
-import com.hbsmoura.videorentalshop.model.Client;
-import com.hbsmoura.videorentalshop.model.Employee;
-import com.hbsmoura.videorentalshop.model.Movie;
-import com.hbsmoura.videorentalshop.repository.BookingRepository;
-import com.hbsmoura.videorentalshop.repository.ClientRepository;
-import com.hbsmoura.videorentalshop.repository.EmployeeRepository;
-import com.hbsmoura.videorentalshop.repository.MovieRepository;
+import com.hbsmoura.videorentalshop.model.*;
+import com.hbsmoura.videorentalshop.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,11 +28,11 @@ public class BookingService {
     private final EmployeeRepository employeeRepository;
 
     @Autowired
-    public BookingService(BookingRepository bookingRepository, MovieRepository movieRepository, ClientRepository clientRepository, EmployeeRepository employeeRepository, EmployeeRepository employeeRepository1) {
+    public BookingService(BookingRepository bookingRepository, MovieRepository movieRepository, ClientRepository clientRepository, EmployeeRepository employeeRepository) {
         this.bookingRepository = bookingRepository;
         this.movieRepository = movieRepository;
         this.clientRepository = clientRepository;
-        this.employeeRepository = employeeRepository1;
+        this.employeeRepository = employeeRepository;
     }
 
     /**

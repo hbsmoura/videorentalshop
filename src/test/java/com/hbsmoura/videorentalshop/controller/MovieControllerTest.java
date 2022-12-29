@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -47,7 +48,7 @@ class MovieControllerTest {
     @MockBean
     private MovieService movieService;
 
-    private Movie mockedMovie = Movie.builder()
+    private final Movie mockedMovie = Movie.builder()
             .id(UUID.randomUUID())
             .title("Mocked Movie")
             .direction("Mocked Director")
@@ -60,10 +61,11 @@ class MovieControllerTest {
             .themes(Set.of("Cars", "Running", "Friendship", "Loyalty"))
             .build();
 
-    private MovieDto mockedMovieDto = new ModelMapper().map(mockedMovie, MovieDto.class);
+    private final MovieDto mockedMovieDto = new ModelMapper().map(mockedMovie, MovieDto.class);
 
     @Test
     @DisplayName("Create movie test")
+    @WithMockUser
     void createMovieTest() throws Exception {
         MovieDto movieDto = new ModelMapper().map(mockedMovie, MovieDto.class);
 
@@ -81,6 +83,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("List movies test")
+    @WithMockUser
     void listMoviesTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -96,6 +99,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Get movie by id test")
+    @WithMockUser
     void getMovieByIdTest() throws Exception {
 
         doReturn(mockedMovieDto).when(movieService).getMovieById(any(UUID.class));
@@ -110,6 +114,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Search movies by title, direction or info test")
+    @WithMockUser
     void searchMoviesByTitleDirectionOrInfoTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -126,6 +131,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Search movies by genre test")
+    @WithMockUser
     void searchMoviesByGenreTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -142,6 +148,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Search movies by theme test")
+    @WithMockUser
     void searchMoviesByThemeTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -158,6 +165,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Update movie test")
+    @WithMockUser
     void updateMovieTest() throws Exception {
         MovieDto mockedMovieDto = new ModelMapper().map(mockedMovie, MovieDto.class);
 
@@ -175,6 +183,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Delete movie test")
+    @WithMockUser
     void deleteMovieTest() throws Exception {
         doNothing().when(movieService).deleteMovieById(any(UUID.class));
 

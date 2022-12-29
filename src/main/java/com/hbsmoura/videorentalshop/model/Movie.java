@@ -2,11 +2,10 @@ package com.hbsmoura.videorentalshop.model;
 
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,7 +14,8 @@ import java.util.UUID;
 * */
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -58,4 +58,33 @@ public class Movie {
     @CollectionTable(name="tb_themes", joinColumns=@JoinColumn(name="movie_id"))
     private Set<String> themes;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Movie movie = (Movie) o;
+        return id != null && Objects.equals(id, movie.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", direction='" + direction + '\'' +
+                ", duration=" + duration +
+                ", year=" + year +
+                ", info='" + info + '\'' +
+                ", totalQuantity=" + totalQuantity +
+                ", quantityAvailable=" + quantityAvailable +
+                ", valuePerDay=" + valuePerDay +
+                ", genres=" + genres +
+                ", themes=" + themes +
+                '}';
+    }
 }

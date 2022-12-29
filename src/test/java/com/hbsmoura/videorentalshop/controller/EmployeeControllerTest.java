@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -48,7 +49,7 @@ class EmployeeControllerTest {
     @MockBean
     private EmployeeService employeeService;
 
-    private Employee mockedEmployee = Employee.builder()
+    private final Employee mockedEmployee = Employee.builder()
             .id(UUID.randomUUID())
             .name("Mocked Name")
             .username("mockeduser")
@@ -56,10 +57,11 @@ class EmployeeControllerTest {
             .manager(false)
             .build();
 
-    private EmployeeDto mockedEmployeeDto = new ModelMapper().map(mockedEmployee, EmployeeDto.class);
+    private final EmployeeDto mockedEmployeeDto = new ModelMapper().map(mockedEmployee, EmployeeDto.class);
 
     @Test
     @DisplayName("Create employee test")
+    @WithMockUser
     void createEmployeeTest() throws Exception {
         EmployeeLoginDto employeeLoginDto = new ModelMapper().map(mockedEmployee, EmployeeLoginDto.class);
 
@@ -77,6 +79,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("List employees test")
+    @WithMockUser
     void listEmployeesTest() throws Exception {
         Page<EmployeeDto> page = new PageImpl<>(Collections.singletonList(mockedEmployeeDto));
 
@@ -92,6 +95,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Get employee by id test")
+    @WithMockUser
     void getEmployeeByIdTest() throws Exception {
 
         doReturn(mockedEmployeeDto).when(employeeService).getEmployeeById(any(UUID.class));
@@ -106,6 +110,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Search by name or username test")
+    @WithMockUser
     void searchEmployeesByNameOrUsernameTest() throws Exception {
         Page<EmployeeDto> page = new PageImpl<>(Collections.singletonList(mockedEmployeeDto));
 
@@ -122,6 +127,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Update employee test")
+    @WithMockUser
     void updateEmployeeTest() throws Exception {
         EmployeeLoginDto mockedEmployeeLoginDto = new ModelMapper().map(mockedEmployee, EmployeeLoginDto.class);
 
@@ -139,6 +145,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Delete employee test")
+    @WithMockUser
     void deleteEmployeeTest() throws Exception {
         doNothing().when(employeeService).deleteEmployeeById(any(UUID.class));
 

@@ -1,4 +1,4 @@
-package com.hbsmoura.videorentalshop.config.initialconfig;
+package com.hbsmoura.videorentalshop.config.initialtestconfig;
 
 import com.hbsmoura.videorentalshop.dtos.*;
 import com.hbsmoura.videorentalshop.model.Client;
@@ -16,7 +16,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 
 import static com.hbsmoura.videorentalshop.enums.EnumMovieGenre.*;
-import static com.hbsmoura.videorentalshop.enums.EnumMovieGenre.WESTERN;
 
 //@Configuration
 public class DataTest {

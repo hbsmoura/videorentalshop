@@ -49,6 +49,9 @@ public class ClientService {
                 .bookings(new ArrayList<>())
                 .build();
 
+        // Only for test
+//        System.out.println("Client: " + newClient.getUsername() + " - Password: " + randomPass);
+
         Client savedClient = clientRepository.save(newClient);
 
         ClientLoginDto clientToBeReturned = new ModelMapper().map(savedClient, ClientLoginDto.class);
@@ -69,7 +72,7 @@ public class ClientService {
     }
 
     /**
-     * Method for retrieve a client by it's id.
+     * Method for retrieve a client by its id.
      * @param id the given id
      * @return the found client
      * @throws ClientNotFoundException if there is no client with the given id on the model layer
@@ -81,7 +84,7 @@ public class ClientService {
     }
 
     /**
-     * Method for search clients by it's name or username.
+     * Method for search clients by its name or username.
      * @param text the text for the search
      * @param pageable the object that carries the page properties
      * @return a page of found clients from the model layer

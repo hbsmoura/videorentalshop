@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
-import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.service.ClientService;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,7 +32,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,17 +49,18 @@ class ClientControllerTest {
     @MockBean
     private ClientService clientService;
 
-    private Client mockedClient = Client.builder()
+    private final Client mockedClient = Client.builder()
             .id(UUID.randomUUID())
             .name("Mocked Name")
             .username("mockeduser")
             .password(new BCryptPasswordEncoder().encode("pass"))
             .build();
 
-    private ClientDto mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
+    private final ClientDto mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
 
     @Test
     @DisplayName("Create client test")
+    @WithMockUser
     void createClientTest() throws Exception {
         ClientLoginDto ClientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
 
@@ -78,6 +78,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("List clients test")
+    @WithMockUser
     void listClientsTest() throws Exception {
         Page<ClientDto> page = new PageImpl<>(Collections.singletonList(mockedClientDto));
 
@@ -93,6 +94,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Get client by id test")
+    @WithMockUser
     void getClientByIdTest() throws Exception {
 
         doReturn(mockedClientDto).when(clientService).getClientById(any(UUID.class));
@@ -107,6 +109,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Search clients by name or username test")
+    @WithMockUser
     void searchClientsByNameOrUsernameTest() throws Exception {
         Page<ClientDto> page = new PageImpl<>(Collections.singletonList(mockedClientDto));
 
@@ -123,6 +126,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Update client test")
+    @WithMockUser
     void updateClientTest() throws Exception {
         ClientLoginDto clientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
         doReturn(clientLoginDto).when(clientService).updateClient(any(ClientLoginDto.class));
@@ -139,6 +143,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Delete client test")
+    @WithMockUser
     void deleteClientTest() throws Exception {
         doNothing().when(clientService).deleteClientById(any(UUID.class));
 
