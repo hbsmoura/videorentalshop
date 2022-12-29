@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -52,7 +53,7 @@ public class BookingControllerTest {
     @MockBean
     private BookingService bookingService;
 
-    private Movie mockedMovie = Movie.builder()
+    private final Movie mockedMovie = Movie.builder()
             .id(UUID.randomUUID())
             .title("Movie Test")
             .direction("Director test")
@@ -65,7 +66,7 @@ public class BookingControllerTest {
             .genres(EnumSet.of(EnumMovieGenre.ADVENTURE, EnumMovieGenre.ROMANCE, EnumMovieGenre.TEEN))
             .themes(new HashSet<>(Arrays.asList("Friendship", "Love", "Youth")))
             .build();
-    private Employee mockedEmployee = Employee.builder()
+    private final Employee mockedEmployee = Employee.builder()
             .id(UUID.randomUUID())
             .name("Employee Test")
             .username("employeetest")
@@ -73,14 +74,14 @@ public class BookingControllerTest {
             .manager(false)
             .build();
 
-    private Client mockedClient = Client.builder()
+    private final Client mockedClient = Client.builder()
             .id(UUID.randomUUID())
             .name("Client Test")
             .username("clienttest")
             .password(UUID.randomUUID().toString())
             .build();
 
-    private Booking mockedBooking = Booking.builder()
+    private final Booking mockedBooking = Booking.builder()
             .id(UUID.randomUUID())
             .renter(mockedClient)
             .movie(mockedMovie)
@@ -95,10 +96,11 @@ public class BookingControllerTest {
             )
             .build();
 
-    private BookingDto mockedBookingDto = new ModelMapper().map(mockedBooking, BookingDto.class);
+    private final BookingDto mockedBookingDto = new ModelMapper().map(mockedBooking, BookingDto.class);
 
     @Test
     @DisplayName("Create booking test")
+    @WithMockUser
     void createBookingTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).createBooking(any(BookingDto.class));
 
@@ -114,6 +116,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("List bookings test")
+    @WithMockUser
     void listBookingsTest() throws Exception {
         Page<BookingDto> page = new PageImpl<>(Collections.singletonList(mockedBookingDto));
 
@@ -129,6 +132,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Get booking by id test")
+    @WithMockUser
     void getBookingByIdTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).getBookingById(any(UUID.class));
 
@@ -142,6 +146,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Search bookings by state test")
+    @WithMockUser
     void searchBookingsByStateTest() throws Exception {
         Page<BookingDto> page = new PageImpl<>(Collections.singletonList(mockedBookingDto));
 
@@ -158,6 +163,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Update booking test")
+    @WithMockUser
     void updateBookingTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).updateBooking(any(BookingDto.class));
 
@@ -173,6 +179,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Cancel booking by id test")
+    @WithMockUser
     void cancelBookingByIdTest() throws Exception {
         BookingDto newBookingDto = BookingDto.builder()
                 .id(mockedBooking.getId())
@@ -200,6 +207,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Start rent test")
+    @WithMockUser
     void startRentTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).startRent(any(BookingDto.class));
 
@@ -215,6 +223,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Finalize rent test")
+    @WithMockUser
     void finalizeRentTest() throws Exception {
         BookingDto newBookingDto = BookingDto.builder()
                 .id(mockedBooking.getId())
@@ -244,6 +253,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Delete movie test")
+    @WithMockUser
     void deleteMovieTest() throws Exception {
         doNothing().when(bookingService).deleteBookingById(any(UUID.class));
 

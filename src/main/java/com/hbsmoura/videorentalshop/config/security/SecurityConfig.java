@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-public class SecurityConfiguration {
+public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -18,7 +18,7 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeHttpRequests()
                 .anyRequest()
-                .permitAll();
+                .authenticated();
 
         return http.build();
     }
