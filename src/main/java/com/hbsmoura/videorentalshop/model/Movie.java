@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class Movie {
     private int quantityAvailable;
 
     @Column(nullable = false)
-    private double valuePerDay;
+    private BigDecimal valuePerDay;
 
     @Column
     @Enumerated

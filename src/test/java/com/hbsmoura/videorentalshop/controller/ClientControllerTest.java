@@ -60,7 +60,6 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Create client test")
-    @WithMockUser
     void createClientTest() throws Exception {
         ClientLoginDto ClientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
 
@@ -78,7 +77,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("List clients test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void listClientsTest() throws Exception {
         Page<ClientDto> page = new PageImpl<>(Collections.singletonList(mockedClientDto));
 
@@ -94,7 +93,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Get client by id test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void getClientByIdTest() throws Exception {
 
         doReturn(mockedClientDto).when(clientService).getClientById(any(UUID.class));
@@ -109,7 +108,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Search clients by name or username test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void searchClientsByNameOrUsernameTest() throws Exception {
         Page<ClientDto> page = new PageImpl<>(Collections.singletonList(mockedClientDto));
 
@@ -126,7 +125,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Update client test")
-    @WithMockUser
+    @WithMockUser(roles = "CLIENT")
     void updateClientTest() throws Exception {
         ClientLoginDto clientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
         doReturn(clientLoginDto).when(clientService).updateClient(any(ClientLoginDto.class));
@@ -143,7 +142,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Delete client test")
-    @WithMockUser
+    @WithMockUser(roles = "MANAGER")
     void deleteClientTest() throws Exception {
         doNothing().when(clientService).deleteClientById(any(UUID.class));
 

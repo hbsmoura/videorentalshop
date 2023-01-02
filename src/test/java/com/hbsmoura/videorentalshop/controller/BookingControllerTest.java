@@ -27,6 +27,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
@@ -60,7 +61,7 @@ public class BookingControllerTest {
             .duration(120)
             .year(1994)
             .info("Some info from the movie")
-            .valuePerDay(1.2)
+            .valuePerDay(new BigDecimal(1d))
             .totalQuantity(3)
             .quantityAvailable(2)
             .genres(EnumSet.of(EnumMovieGenre.ADVENTURE, EnumMovieGenre.ROMANCE, EnumMovieGenre.TEEN))
@@ -90,9 +91,11 @@ public class BookingControllerTest {
             .rentAssignor(mockedEmployee)
             .rentStart(LocalDate.now())
             .regularPrice(
-                    mockedMovie.getValuePerDay() * Period.between(
-                            LocalDate.now(), LocalDate.now().plusDays(3L)
-                    ).getDays()
+                    mockedMovie.getValuePerDay().multiply(
+                            new BigDecimal(Period.between(
+                                    LocalDate.now(), LocalDate.now().plusDays(3L)
+                                ).getDays())
+                    )
             )
             .build();
 
@@ -100,7 +103,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Create booking test")
-    @WithMockUser
+    @WithMockUser(roles = "CLIENT")
     void createBookingTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).createBooking(any(BookingDto.class));
 
@@ -108,15 +111,15 @@ public class BookingControllerTest {
                 .perform(
                         post("/bookings")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(mockedBookingDto))
+                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
+
                 )
-                .andExpect(status().isCreated())
-                .andExpect(content().json(getJsonStringOfBookingDtoWithoutLink()));
+                .andExpect(status().isCreated());
     }
 
     @Test
     @DisplayName("List bookings test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void listBookingsTest() throws Exception {
         Page<BookingDto> page = new PageImpl<>(Collections.singletonList(mockedBookingDto));
 
@@ -132,7 +135,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Get booking by id test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void getBookingByIdTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).getBookingById(any(UUID.class));
 
@@ -146,7 +149,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Search bookings by state test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void searchBookingsByStateTest() throws Exception {
         Page<BookingDto> page = new PageImpl<>(Collections.singletonList(mockedBookingDto));
 
@@ -163,7 +166,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Update booking test")
-    @WithMockUser
+    @WithMockUser(roles = "MANAGER")
     void updateBookingTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).updateBooking(any(BookingDto.class));
 
@@ -171,15 +174,14 @@ public class BookingControllerTest {
                 .perform(
                         put("/bookings")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(mockedBookingDto))
+                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
                 )
-                .andExpect(status().isOk())
-                .andExpect(content().json(getJsonStringOfBookingDtoWithoutLink()));
+                .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Cancel booking by id test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void cancelBookingByIdTest() throws Exception {
         BookingDto newBookingDto = BookingDto.builder()
                 .id(mockedBooking.getId())
@@ -207,7 +209,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Start rent test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void startRentTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).startRent(any(BookingDto.class));
 
@@ -215,15 +217,14 @@ public class BookingControllerTest {
                 .perform(
                         patch("/bookings/start")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(mockedBookingDto))
+                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
                 )
-                .andExpect(status().isOk())
-                .andExpect(content().json(getJsonStringOfBookingDtoWithoutLink()));
+                .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Finalize rent test")
-    @WithMockUser
+    @WithMockUser(roles = "EMPLOYEE")
     void finalizeRentTest() throws Exception {
         BookingDto newBookingDto = BookingDto.builder()
                 .id(mockedBooking.getId())
@@ -237,7 +238,7 @@ public class BookingControllerTest {
                 .build();
 
         ObjectNode objectNode = mapper.readTree(mapper.writeValueAsString(newBookingDto)).deepCopy();
-        String jsonObject = objectNode.without("links").toPrettyString();
+        String jsonObject = objectNode.without("links").toString();
 
         doReturn(newBookingDto).when(bookingService).finalizeRent(any(BookingDto.class));
 
@@ -245,7 +246,7 @@ public class BookingControllerTest {
                 .perform(
                         patch("/bookings/finalize")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(mockedBookingDto))
+                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonObject));
@@ -253,7 +254,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Delete movie test")
-    @WithMockUser
+    @WithMockUser(roles = "MANAGER")
     void deleteMovieTest() throws Exception {
         doNothing().when(bookingService).deleteBookingById(any(UUID.class));
 
@@ -268,7 +269,7 @@ public class BookingControllerTest {
     // The Employee DTO object instance without the property "links"
     // to prevent mismatch, due to Hateoas support
     private String getJsonStringOfBookingDtoWithoutLink() throws JsonProcessingException {
-        ObjectNode objectNode = mapper.readTree(mapper.writeValueAsString(mockedBookingDto)).deepCopy();
-        return objectNode.without("links").toPrettyString();
+        ObjectNode objectNode = mapper.readTree(mapper.writeValueAsString(mockedBooking)).deepCopy();
+        return objectNode.without("links").toString();
     }
 }

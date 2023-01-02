@@ -25,7 +25,8 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -133,10 +134,32 @@ class EmployeeServiceTest {
 
     @Test
     @DisplayName("Update employee throw exception test")
-    void updateEmployeeThrowExcpetionTest() {
+    void updateEmployeeThrowExceptionTest() {
         doReturn(Optional.empty()).when(employeeRepository).findById(any(UUID.class));
 
         assertThrows(EmployeeNotFoundException.class, () -> employeeService.updateEmployee(mockedEmployeeLoginDto));
+    }
+
+    @Test
+    @DisplayName("Set management test")
+    void setManagementTest() {
+        doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
+        doReturn(mockedEmployee).when(employeeRepository).save(any(Employee.class));
+
+        EmployeeDto returnedEmployeeDto = employeeService.setManagement(UUID.randomUUID(), false);
+
+        assertThat(returnedEmployeeDto.getId(), is(mockedEmployee.getId()));
+        assertThat(returnedEmployeeDto.getName(), is(mockedEmployee.getName()));
+        assertThat(returnedEmployeeDto.getUsername(), is(mockedEmployee.getUsername()));
+        assertThat(returnedEmployeeDto.isManager(), is(mockedEmployee.isManager()));
+    }
+
+    @Test
+    @DisplayName("Set management throw exception test")
+    void setManagementThrowExceptionTest() {
+        doReturn(Optional.empty()).when(employeeRepository).findById(any(UUID.class));
+
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.setManagement(UUID.randomUUID(), true));
     }
 
     @Test

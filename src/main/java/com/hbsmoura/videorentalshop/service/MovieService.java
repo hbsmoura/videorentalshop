@@ -52,7 +52,7 @@ public class MovieService {
     }
 
     /**
-     * Method for retrieve a movie by it's id.
+     * Method for retrieve a movie by its id.
      * @param id the given id
      * @return the found movie
      * @throws MovieNotFoundException if there is no movie with the given id on the model layer
@@ -64,7 +64,7 @@ public class MovieService {
     }
 
     /**
-     * Method for search movies by it's title, director ou info.
+     * Method for search movies by its title, director ou info.
      * @param text the text for the search
      * @param pageable the object that carries the page properties
      * @return a page of found movies from the model layer
@@ -79,7 +79,7 @@ public class MovieService {
     }
 
     /**
-     * Method for search movies by it's set of genres.
+     * Method for search movies by its set of genres.
      * @param givenGenre the text for search
      * @param pageable the object that carries the page properties
      * @throws NoSuchGenreException if there is no corresponding genre for the given text
@@ -98,7 +98,7 @@ public class MovieService {
     }
 
     /**
-     * Method for search movies by it's list ou themes.
+     * Method for search movies by its list ou themes.
      * @param theme the text for the search
      * @param pageable the object that carries the page properties
      * @return a page of found movies from the model layer

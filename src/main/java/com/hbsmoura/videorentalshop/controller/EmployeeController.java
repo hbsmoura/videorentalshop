@@ -48,6 +48,11 @@ public class EmployeeController {
         return employeeService.updateEmployee(givenEmployee);
     }
 
+    @PatchMapping("/{id}/management/{set}")
+    public EmployeeDto setManagement(@PathVariable("id") UUID id, @PathVariable("set") boolean set) {
+        return employeeService.setManagement(id, set);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Employee with given Id successfully deleted")
     public void deleteEmployee(@PathVariable("id") UUID id) {

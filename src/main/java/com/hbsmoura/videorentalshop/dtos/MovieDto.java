@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class MovieDto extends RepresentationModel<MovieDto> {
     private int quantityAvailable;
 
     @NotBlank
-    private double valuePerDay;
+    private BigDecimal valuePerDay;
 
     private Set<EnumMovieGenre> genres;
 

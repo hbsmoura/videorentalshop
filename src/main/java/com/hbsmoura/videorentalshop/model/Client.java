@@ -1,6 +1,7 @@
 package com.hbsmoura.videorentalshop.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.hbsmoura.videorentalshop.enums.EnumUserRole;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -9,9 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,8 +33,8 @@ public class Client extends User {
     private List<Booking> bookings;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public Collection<EnumUserRole> getAuthorities() {
+        return Collections.singleton(EnumUserRole.ROLE_CLIENT);
     }
 
     @Override

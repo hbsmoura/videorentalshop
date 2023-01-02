@@ -23,14 +23,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,7 +59,7 @@ class MovieControllerTest {
             .info("Mocked info")
             .totalQuantity(3)
             .quantityAvailable(2)
-            .valuePerDay(1.2)
+            .valuePerDay(new BigDecimal(1.2))
             .genres(EnumSet.of(EnumMovieGenre.ACTION, EnumMovieGenre.ADVENTURE, EnumMovieGenre.FANTASY))
             .themes(Set.of("Cars", "Running", "Friendship", "Loyalty"))
             .build();
@@ -65,7 +68,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Create movie test")
-    @WithMockUser
+    @WithMockUser(roles = {"EMPLOYEE"})
     void createMovieTest() throws Exception {
         MovieDto movieDto = new ModelMapper().map(mockedMovie, MovieDto.class);
 
@@ -83,7 +86,6 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("List movies test")
-    @WithMockUser
     void listMoviesTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -99,7 +101,6 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Get movie by id test")
-    @WithMockUser
     void getMovieByIdTest() throws Exception {
 
         doReturn(mockedMovieDto).when(movieService).getMovieById(any(UUID.class));
@@ -114,7 +115,6 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Search movies by title, direction or info test")
-    @WithMockUser
     void searchMoviesByTitleDirectionOrInfoTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -131,7 +131,6 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Search movies by genre test")
-    @WithMockUser
     void searchMoviesByGenreTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -148,7 +147,6 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Search movies by theme test")
-    @WithMockUser
     void searchMoviesByThemeTest() throws Exception {
         Page<MovieDto> page = new PageImpl<>(Collections.singletonList(mockedMovieDto));
 
@@ -165,7 +163,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Update movie test")
-    @WithMockUser
+    @WithMockUser(roles = {"EMPLOYEE"})
     void updateMovieTest() throws Exception {
         MovieDto mockedMovieDto = new ModelMapper().map(mockedMovie, MovieDto.class);
 
@@ -183,7 +181,7 @@ class MovieControllerTest {
 
     @Test
     @DisplayName("Delete movie test")
-    @WithMockUser
+    @WithMockUser(roles = {"MANAGER"})
     void deleteMovieTest() throws Exception {
         doNothing().when(movieService).deleteMovieById(any(UUID.class));
 
