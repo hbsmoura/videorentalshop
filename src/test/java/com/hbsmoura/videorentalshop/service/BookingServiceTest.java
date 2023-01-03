@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
@@ -31,6 +32,7 @@ import java.util.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -63,7 +65,7 @@ public class BookingServiceTest {
             .duration(120)
             .year(1994)
             .info("Some info from the movie")
-            .valuePerDay(1.2)
+            .valuePerDay(new BigDecimal(1.2))
             .totalQuantity(3)
             .quantityAvailable(2)
             .genres(EnumSet.of(EnumMovieGenre.ADVENTURE, EnumMovieGenre.ROMANCE, EnumMovieGenre.TEEN))
@@ -93,9 +95,11 @@ public class BookingServiceTest {
             .rentAssignor(mockedEmployee)
             .rentStart(LocalDate.now())
             .regularPrice(
-                    mockedMovie.getValuePerDay() * Period.between(
-                            LocalDate.now(), LocalDate.now().plusDays(3L)
-                    ).getDays()
+                    mockedMovie.getValuePerDay().multiply(
+                            new BigDecimal(Period.between(
+                                    LocalDate.now(), LocalDate.now().plusDays(3L)
+                            ).getDays())
+                    )
             )
             .build();
 
@@ -129,8 +133,8 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getActualDevolution(), is(nullValue()));
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
         assertThat(returnedBooking.getState(), is(EnumBookingState.REQUESTED));
-        assertThat(returnedBooking.getRegularPrice(), is(0d));
-        assertThat(returnedBooking.getPenalty(), is(0d));
+        assertNull(returnedBooking.getRegularPrice());
+        assertNull(returnedBooking.getPenalty());
 
     }
 
@@ -159,7 +163,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    @DisplayName("Find booking by the given id test")
+    @DisplayName("Get booking by the given id test")
     void getBookingByIdTest() {
         doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
 
@@ -175,7 +179,7 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
         assertThat(returnedBooking.getState(), is(EnumBookingState.RENTED));
         assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
-        assertThat(returnedBooking.getPenalty(), is(0d));
+        assertNull(returnedBooking.getPenalty());
     }
 
     @Test
@@ -222,7 +226,7 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
         assertThat(returnedBooking.getState(), is(EnumBookingState.RENTED));
         assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
-        assertThat(returnedBooking.getPenalty(), is(0d));
+        assertNull(returnedBooking.getPenalty());
     }
 
     @Test
@@ -256,6 +260,7 @@ public class BookingServiceTest {
                 .movie(mockedMovie)
                 .renter(mockedClient)
                 .state(EnumBookingState.REQUESTED)
+                .regularPrice(new BigDecimal(3.6d))
                 .build();
 
         doReturn(Optional.of(newMockedBooking)).when(bookingRepository).findById(any(UUID.class));
@@ -271,8 +276,8 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getActualDevolution(), is(nullValue()));
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
         assertThat(returnedBooking.getState(), is(EnumBookingState.CANCELED));
-        assertThat(returnedBooking.getRegularPrice(), is(0d));
-        assertThat(returnedBooking.getPenalty(), is(0d));
+        assertThat(returnedBooking.getRegularPrice(), is(newMockedBooking.getRegularPrice()));
+        assertThat(returnedBooking.getPenalty(), is(newMockedBooking.getPenalty()));
     }
 
     @Test
@@ -324,7 +329,7 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
         assertThat(returnedBooking.getState(), is(EnumBookingState.RENTED));
         assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
-        assertThat(returnedBooking.getPenalty(), is(0d));
+        assertNull(returnedBooking.getPenalty());
     }
 
     @Test
@@ -365,7 +370,7 @@ public class BookingServiceTest {
                                 .duration(120)
                                 .year(1994)
                                 .info("Some info from the movie")
-                                .valuePerDay(1.2)
+                                .valuePerDay(new BigDecimal(1.2))
                                 .totalQuantity(3)
                                 .quantityAvailable(0)
                                 .genres(EnumSet.of(EnumMovieGenre.ADVENTURE, EnumMovieGenre.ROMANCE, EnumMovieGenre.TEEN))
@@ -395,9 +400,14 @@ public class BookingServiceTest {
                 .rentAssignor(mockedEmployee)
                 .rentStart(LocalDate.now().minusDays(1L))
                 .regularPrice(
-                        mockedMovie.getValuePerDay() * Period.between(
-                                LocalDate.now().minusDays(1L), LocalDate.now()
-                        ).getDays()
+                        mockedMovie.getValuePerDay().multiply(
+                                new BigDecimal(
+                                        Period.between(
+                                                LocalDate.now().minusDays(1L),
+                                                LocalDate.now()
+                                        ).getDays()
+                                )
+                        )
                 )
                 .devolutionAssignor(mockedEmployee)
                 .actualDevolution(LocalDate.now())
@@ -422,7 +432,7 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getDevolutionAssignor(), is(mockedEmployee));
         assertThat(returnedBooking.getState(), is(EnumBookingState.FINALIZED));
         assertThat(returnedBooking.getRegularPrice(), is(newMockedBooking.getRegularPrice()));
-        assertThat(returnedBooking.getPenalty(), is(0 - newMockedBooking.getRegularPrice()));
+        assertThat(returnedBooking.getPenalty(), is(new BigDecimal(0).subtract(newMockedBooking.getRegularPrice())));
     }
 
     @Test
@@ -443,9 +453,14 @@ public class BookingServiceTest {
                 .rentAssignor(mockedEmployee)
                 .rentStart(LocalDate.now().minusDays(1L))
                 .regularPrice(
-                        mockedMovie.getValuePerDay() * Period.between(
-                                LocalDate.now().minusDays(1L), LocalDate.now()
-                        ).getDays()
+                        mockedMovie.getValuePerDay().multiply(
+                                new BigDecimal(
+                                        Period.between(
+                                                LocalDate.now().minusDays(1L),
+                                                LocalDate.now()
+                                        ).getDays()
+                                )
+                        )
                 )
                 .devolutionAssignor(mockedEmployee)
                 .actualDevolution(LocalDate.now())
@@ -470,9 +485,14 @@ public class BookingServiceTest {
                 .rentAssignor(mockedEmployee)
                 .rentStart(LocalDate.now().minusDays(1L))
                 .regularPrice(
-                        mockedMovie.getValuePerDay() * Period.between(
-                                LocalDate.now().minusDays(1L), LocalDate.now()
-                        ).getDays()
+                        mockedMovie.getValuePerDay().multiply(
+                                new BigDecimal(
+                                        Period.between(
+                                                LocalDate.now().minusDays(1L),
+                                                LocalDate.now()
+                                        ).getDays()
+                                )
+                        )
                 )
                 .devolutionAssignor(mockedEmployee)
                 .actualDevolution(LocalDate.now())

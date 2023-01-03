@@ -27,8 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -61,7 +60,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Create employee test")
-    @WithMockUser
+    @WithMockUser(roles = {"MANAGER"})
     void createEmployeeTest() throws Exception {
         EmployeeLoginDto employeeLoginDto = new ModelMapper().map(mockedEmployee, EmployeeLoginDto.class);
 
@@ -79,7 +78,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("List employees test")
-    @WithMockUser
+    @WithMockUser(roles = {"MANAGER"})
     void listEmployeesTest() throws Exception {
         Page<EmployeeDto> page = new PageImpl<>(Collections.singletonList(mockedEmployeeDto));
 
@@ -95,7 +94,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Get employee by id test")
-    @WithMockUser
+    @WithMockUser(roles = {"MANAGER"})
     void getEmployeeByIdTest() throws Exception {
 
         doReturn(mockedEmployeeDto).when(employeeService).getEmployeeById(any(UUID.class));
@@ -110,7 +109,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Search by name or username test")
-    @WithMockUser
+    @WithMockUser(roles = {"MANAGER"})
     void searchEmployeesByNameOrUsernameTest() throws Exception {
         Page<EmployeeDto> page = new PageImpl<>(Collections.singletonList(mockedEmployeeDto));
 
@@ -127,7 +126,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Update employee test")
-    @WithMockUser
+    @WithMockUser(roles = {"EMPLOYEE"})
     void updateEmployeeTest() throws Exception {
         EmployeeLoginDto mockedEmployeeLoginDto = new ModelMapper().map(mockedEmployee, EmployeeLoginDto.class);
 
@@ -144,8 +143,25 @@ class EmployeeControllerTest {
     }
 
     @Test
+    @DisplayName("Set management test")
+    @WithMockUser(roles = {"MANAGER"})
+    void setManagementTest() throws Exception {
+        EmployeeDto mockedEmployeeDto = new ModelMapper().map(mockedEmployee, EmployeeDto.class);
+
+        doReturn(mockedEmployeeDto).when(employeeService).setManagement(any(UUID.class), anyBoolean());
+
+        mockMvc
+                .perform(
+                        patch("/employees/"+ mockedEmployeeDto.getId()
+                                + "/management/" + false)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(getJsonStringOfEmployeeDtoWithoutLink()));
+    }
+
+    @Test
     @DisplayName("Delete employee test")
-    @WithMockUser
+    @WithMockUser(roles = {"MANAGER"})
     void deleteEmployeeTest() throws Exception {
         doNothing().when(employeeService).deleteEmployeeById(any(UUID.class));
 

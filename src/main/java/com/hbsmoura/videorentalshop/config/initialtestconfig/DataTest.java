@@ -10,6 +10,7 @@ import com.hbsmoura.videorentalshop.service.MovieService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -95,7 +96,7 @@ public class DataTest {
                         .year(1994)
                         .info("The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.")
                         .totalQuantity(3)
-                        .valuePerDay(1.2)
+                        .valuePerDay(new BigDecimal(1.2))
                         .genres(EnumSet.of(ACTION, CRIME, DRAMA))
                         .themes(new HashSet<>(Arrays.asList("Bang bang", "Mafia", "Morality", "Revenge", "Violence")))
                         .build()
@@ -109,7 +110,7 @@ public class DataTest {
                         .year(1980)
                         .info("Jack Torrance becomes winter caretaker at the isolated Overlook Hotel in Colorado, hoping to cure his writer's block. He settles in along with his wife, Wendy, and his son, Danny, who is plagued by psychic premonitions")
                         .totalQuantity(3)
-                        .valuePerDay(1.3)
+                        .valuePerDay(new BigDecimal(1.3))
                         .genres(EnumSet.of(THRILLER, HORROR, MYSTERY))
                         .themes(new HashSet<>(Arrays.asList(
                                 "Fear", "Insanity", "Madness", "Murder", "Paranormal Activity", "Revenge", "Violence"
@@ -125,7 +126,7 @@ public class DataTest {
                         .year(2012)
                         .info("With the help of a German bounty-hunter, a freed slave sets out to rescue his wife from a brutal plantation-owner in Mississippi")
                         .totalQuantity(4)
-                        .valuePerDay(1.1)
+                        .valuePerDay(new BigDecimal(1.1))
                         .genres(EnumSet.of(ACTION, DRAMA, HISTORICAL, WESTERN))
                         .themes(new HashSet<>(Arrays.asList("Bang bang", "Morality", "Power", "Racism", "Revenge", "Slavery", "Violence")))
                         .build()

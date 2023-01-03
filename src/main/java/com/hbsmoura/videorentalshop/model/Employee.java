@@ -1,12 +1,17 @@
 package com.hbsmoura.videorentalshop.model;
 
+import com.hbsmoura.videorentalshop.enums.EnumUserRole;
 import jakarta.persistence.Entity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
-import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -24,8 +29,9 @@ public class Employee extends User{
     private boolean manager;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public Collection<EnumUserRole> getAuthorities() {
+        if (manager) return Arrays.asList(EnumUserRole.ROLE_EMPLOYEE, EnumUserRole.ROLE_MANAGER);
+        return Collections.singletonList(EnumUserRole.ROLE_EMPLOYEE);
     }
 
     @Override

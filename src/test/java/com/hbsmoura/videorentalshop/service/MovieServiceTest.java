@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -30,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class MovieServiceTest {
@@ -50,7 +50,7 @@ public class MovieServiceTest {
             .info("Some info...")
             .totalQuantity(3)
             .quantityAvailable(2)
-            .valuePerDay(1.2)
+            .valuePerDay(new BigDecimal(1.2))
             .genres(new HashSet<>())
             .themes(new HashSet<>())
             .build();

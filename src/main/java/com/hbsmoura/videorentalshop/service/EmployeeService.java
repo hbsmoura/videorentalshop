@@ -102,11 +102,28 @@ public class EmployeeService {
 
         employee.setName(givenEmployee.getName());
         employee.setUsername(givenEmployee.getUsername());
-        employee.setManager(givenEmployee.isManager());
 
         employeeRepository.save(employee);
 
         return new ModelMapper().map(employee, EmployeeLoginDto.class);
+    }
+
+    /**
+     * Method for update a given employee.
+     * @param id the id of the employee
+     * @param set the boolean value to be setup
+     * @return the updated employee
+     * @throws EmployeeNotFoundException if there is no employee with the id of the given employee on the model layer
+     */
+
+    public EmployeeDto setManagement(UUID id, boolean set) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
+
+        employee.setManager(set);
+
+        employeeRepository.save(employee);
+
+        return new ModelMapper().map(employee, EmployeeDto.class);
     }
 
     /**

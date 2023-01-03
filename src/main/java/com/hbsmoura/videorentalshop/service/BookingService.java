@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.UUID;
@@ -81,7 +82,7 @@ public class BookingService {
     }
 
     /**
-     * Method for retrieve a booking by it's id.
+     * Method for retrieve a booking by its id.
      * @param id the given id
      * @return the found movie
      * @throws BookingNotFoundException if there is no booking with the given id on the model layer
@@ -93,7 +94,7 @@ public class BookingService {
     }
 
     /**
-     * Method for search bookings by it's state.
+     * Method for search bookings by its state.
      * @param givenState the state for the search
      * @param pageable the object that carries the page properties
      * @throws NoSuchGenreException if there is no such state as the given
@@ -159,7 +160,7 @@ public class BookingService {
         if (booking.getState() != EnumBookingState.REQUESTED) throw new BookingCannotBeUpdatedFromRequestedException(Operation.CANCELED);
 
         booking.setState(EnumBookingState.CANCELED);
-        booking.setPenalty(0 - booking.getRegularPrice());
+        booking.setPenalty(new BigDecimal(0).subtract(booking.getRegularPrice()));
 
         return new ModelMapper().map(booking, BookingDto.class);
     }
@@ -191,7 +192,13 @@ public class BookingService {
         booking.setState(EnumBookingState.RENTED);
         movie.setQuantityAvailable(movie.getQuantityAvailable()-1);
         booking.setRegularPrice(
-                movie.getValuePerDay() * Period.between(booking.getRentStart(), booking.getEstimatedDevolution()).getDays()
+                movie.getValuePerDay().multiply(
+                        new BigDecimal(
+                                Period
+                                        .between(booking.getRentStart(), booking.getEstimatedDevolution())
+                                        .getDays()
+                        )
+                )
         );
 
         movieRepository.save(movie);
@@ -224,11 +231,15 @@ public class BookingService {
 
         if (booking.getState() == EnumBookingState.RENTED) {
             booking.setPenalty(
-                    movie.getValuePerDay() * Period.between(booking.getRentStart(), booking.getActualDevolution()).getDays()
+                    movie.getValuePerDay().multiply(
+                            new BigDecimal(
+                                    Period.between(booking.getRentStart(), booking.getActualDevolution()).getDays()
+                            )
+                    )
             );
             movie.setQuantityAvailable(movie.getQuantityAvailable()+1);
         } else {
-            booking.setPenalty(0 - booking.getRegularPrice());
+            booking.setPenalty(new BigDecimal(0).subtract(booking.getRegularPrice()));
         }
 
         movieRepository.save(movie);

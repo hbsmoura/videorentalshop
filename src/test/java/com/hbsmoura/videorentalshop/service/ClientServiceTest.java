@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ClientServiceTest {
+class ClientServiceTest {
 
     @InjectMocks
     private ClientService clientService;
@@ -58,6 +59,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Create client test")
+    @WithMockUser(roles = {"CLIENT"})
     void createClientTest() {
         doReturn(mockedClient.getPassword()).when(passwordEncoder).encode(anyString());
         doReturn(mockedClient).when(clientRepository).save(any(Client.class));
@@ -75,6 +77,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Paging list of clients test")
+    @WithMockUser(roles = {"EMPLOYEE"})
     void listClientsTest() {
         ClientDto mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
 
@@ -88,6 +91,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Find client by the given id test")
+    @WithMockUser(roles = {"EMPLOYEE"})
     void getClientById() {
         doReturn(Optional.of(mockedClient)).when(clientRepository).findById(any(UUID.class));
 
@@ -101,6 +105,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Find client by the given id throw exception test")
+    @WithMockUser(roles = {"EMPLOYEE"})
     void getClientByIdThrowExceptionTest() {
         doReturn(Optional.empty()).when(clientRepository).findById(any(UUID.class));
 
@@ -109,6 +114,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Search client by name or username test")
+    @WithMockUser(roles = {"EMPLOYEE"})
     void searchClientByNameOrUsernameTest() {
         ClientDto mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
 
@@ -126,6 +132,7 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Update client test")
+    @WithMockUser(roles = {"CLIENT"})
     void updateClientTest() {
         ClientLoginDto mockedClientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
 
@@ -143,7 +150,8 @@ public class ClientServiceTest {
 
     @Test
     @DisplayName("Update client throw exception test")
-    void updateClientThrowExcpetionTest() {
+    @WithMockUser(roles = {"EMPLOYEE"})
+    void updateClientThrowExceptionTest() {
         ClientLoginDto mockedClientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
 
         doReturn(Optional.empty()).when(clientRepository).findById(any(UUID.class));
@@ -164,7 +172,8 @@ public class ClientServiceTest {
     }
 
     @Test
-    @DisplayName("Delete client by id throw excpetion test")
+    @DisplayName("Delete client by id throw exception test")
+    @WithMockUser(roles = {"EMPLOYEE"})
     void deleteClientByIdThrowException() {
         doReturn(Optional.empty()).when(clientRepository).findById(any(UUID.class));
 

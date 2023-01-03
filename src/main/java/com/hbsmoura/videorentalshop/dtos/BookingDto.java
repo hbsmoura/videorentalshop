@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class BookingDto extends RepresentationModel<BookingDto> {
 
     private EnumBookingState state;
 
-    private double regularPrice;
+    private BigDecimal regularPrice;
 
-    private double penalty;
+    private BigDecimal penalty;
 }
