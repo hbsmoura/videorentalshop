@@ -1,8 +1,10 @@
 package com.hbsmoura.videorentalshop.service;
 
+import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
 import com.hbsmoura.videorentalshop.exceptions.EmployeeNotFoundException;
+import com.hbsmoura.videorentalshop.exceptions.PasswordNotMachException;
 import com.hbsmoura.videorentalshop.model.Employee;
 import com.hbsmoura.videorentalshop.repository.EmployeeRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -97,7 +99,7 @@ public class EmployeeService {
      * @throws EmployeeNotFoundException if there is no employee with the id of the given employee on the model layer
      */
 
-    public EmployeeLoginDto updateEmployee(EmployeeLoginDto givenEmployee) {
+    public EmployeeDto updateEmployee(EmployeeLoginDto givenEmployee) {
         Employee employee = employeeRepository.findById(givenEmployee.getId()).orElseThrow(EmployeeNotFoundException::new);
 
         employee.setName(givenEmployee.getName());
@@ -105,7 +107,7 @@ public class EmployeeService {
 
         employeeRepository.save(employee);
 
-        return new ModelMapper().map(employee, EmployeeLoginDto.class);
+        return new ModelMapper().map(employee, EmployeeDto.class);
     }
 
     /**
@@ -124,6 +126,25 @@ public class EmployeeService {
         employeeRepository.save(employee);
 
         return new ModelMapper().map(employee, EmployeeDto.class);
+    }
+
+    /**
+     * Method for change the password of a client.
+     * @param id the given id
+     * @param changePasswordDto object containing the client's id, the current password and the new one
+     * @throws EmployeeNotFoundException if there is no employee with the given id on the model layer
+     * @throws PasswordNotMachException if the given current password does not match with the saved one
+     */
+
+    public void changePassword(UUID id, ChangePasswordDto changePasswordDto) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
+
+        if (!passwordEncoder.matches(changePasswordDto.getCurrentPassword(), employee.getPassword()))
+            throw new PasswordNotMachException();
+
+        employee.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+
+        employeeRepository.save(employee);
     }
 
     /**

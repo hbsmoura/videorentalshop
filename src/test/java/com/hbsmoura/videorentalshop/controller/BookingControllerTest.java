@@ -3,6 +3,7 @@ package com.hbsmoura.videorentalshop.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hbsmoura.videorentalshop.config.security.SecurityConfigTest;
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.enums.EnumBookingState;
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
@@ -16,9 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -41,8 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(value = BookingController.class)
+@Import(SecurityConfigTest.class)
 public class BookingControllerTest {
 
     @Autowired
@@ -181,7 +182,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Cancel booking by id test")
-    @WithMockUser(roles = "EMPLOYEE")
+    @WithMockUser(roles = "CLIENT")
     void cancelBookingByIdTest() throws Exception {
         BookingDto newBookingDto = BookingDto.builder()
                 .id(mockedBooking.getId())

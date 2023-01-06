@@ -5,23 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.RepresentationModel;
-
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmployeeDto extends RepresentationModel<EmployeeDto> {
-
-    private UUID id;
+public class ChangePasswordDto {
 
     @NotBlank
-    private String name;
+    private String currentPassword;
 
     @NotBlank
-    private String username;
-
-    private boolean manager;
+    private String newPassword;
 }

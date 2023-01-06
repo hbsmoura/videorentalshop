@@ -3,24 +3,28 @@ package com.hbsmoura.videorentalshop.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hbsmoura.videorentalshop.config.security.SecurityConfigTest;
+import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
 import com.hbsmoura.videorentalshop.model.Employee;
 import com.hbsmoura.videorentalshop.service.EmployeeService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,13 +34,14 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(value = EmployeeController.class)
+@Import({SecurityConfigTest.class})
 class EmployeeControllerTest {
 
     @Autowired
@@ -45,22 +50,31 @@ class EmployeeControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @MockBean
     private EmployeeService employeeService;
 
-    private final Employee mockedEmployee = Employee.builder()
-            .id(UUID.randomUUID())
-            .name("Mocked Name")
-            .username("mockeduser")
-            .password(new BCryptPasswordEncoder().encode("pass"))
-            .manager(false)
-            .build();
+    private Employee mockedEmployee;
+    private EmployeeDto mockedEmployeeDto;
 
-    private final EmployeeDto mockedEmployeeDto = new ModelMapper().map(mockedEmployee, EmployeeDto.class);
+    @BeforeEach
+    public void setup() {
+        mockedEmployee = Employee.builder()
+                .id(UUID.fromString("7b8e6d52-9534-45d6-a8f9-43c41082d7ff"))
+                .name("Mocked Employee")
+                .username("mockedemployee")
+                .password(passwordEncoder.encode("pass"))
+                .manager(false)
+                .build();
+
+        mockedEmployeeDto = new ModelMapper().map(mockedEmployee, EmployeeDto.class);
+    }
 
     @Test
     @DisplayName("Create employee test")
-    @WithMockUser(roles = {"MANAGER"})
+    @WithMockUser(roles = "MANAGER")
     void createEmployeeTest() throws Exception {
         EmployeeLoginDto employeeLoginDto = new ModelMapper().map(mockedEmployee, EmployeeLoginDto.class);
 
@@ -78,7 +92,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("List employees test")
-    @WithMockUser(roles = {"MANAGER"})
+    @WithMockUser(roles = "MANAGER")
     void listEmployeesTest() throws Exception {
         Page<EmployeeDto> page = new PageImpl<>(Collections.singletonList(mockedEmployeeDto));
 
@@ -94,7 +108,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Get employee by id test")
-    @WithMockUser(roles = {"MANAGER"})
+    @WithMockUser(roles = "MANAGER")
     void getEmployeeByIdTest() throws Exception {
 
         doReturn(mockedEmployeeDto).when(employeeService).getEmployeeById(any(UUID.class));
@@ -109,7 +123,7 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Search by name or username test")
-    @WithMockUser(roles = {"MANAGER"})
+    @WithMockUser(roles = "MANAGER")
     void searchEmployeesByNameOrUsernameTest() throws Exception {
         Page<EmployeeDto> page = new PageImpl<>(Collections.singletonList(mockedEmployeeDto));
 
@@ -126,25 +140,25 @@ class EmployeeControllerTest {
 
     @Test
     @DisplayName("Update employee test")
-    @WithMockUser(roles = {"EMPLOYEE"})
+    @WithUserDetails(userDetailsServiceBeanName = "userService", value = "mockedemployee")
     void updateEmployeeTest() throws Exception {
-        EmployeeLoginDto mockedEmployeeLoginDto = new ModelMapper().map(mockedEmployee, EmployeeLoginDto.class);
+        EmployeeDto mockedEmployeeDto = new ModelMapper().map(mockedEmployee, EmployeeDto.class);
 
-        doReturn(mockedEmployeeLoginDto).when(employeeService).updateEmployee(any(EmployeeLoginDto.class));
+        doReturn(mockedEmployeeDto).when(employeeService).updateEmployee(any(EmployeeLoginDto.class));
 
         mockMvc
                 .perform(
                         put("/employees")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(mockedEmployeeDto))
+                                .with(user(mockedEmployee))
                 )
-                .andExpect(status().isOk())
-                .andExpect(content().json(mapper.writeValueAsString(mockedEmployeeLoginDto)));
+                .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Set management test")
-    @WithMockUser(roles = {"MANAGER"})
+    @WithMockUser(roles = "MANAGER")
     void setManagementTest() throws Exception {
         EmployeeDto mockedEmployeeDto = new ModelMapper().map(mockedEmployee, EmployeeDto.class);
 
@@ -160,8 +174,29 @@ class EmployeeControllerTest {
     }
 
     @Test
+    @DisplayName("Change password test")
+    @WithUserDetails(value = "mockedemployee", userDetailsServiceBeanName = "userService")
+    void changePasswordTest() throws Exception {
+        doNothing().when(employeeService).changePassword(any(UUID.class), any(ChangePasswordDto.class));
+
+        mockMvc
+                .perform(
+                        patch("/employees/"+ mockedEmployee.getId() +"/password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        mapper.writeValueAsString(
+                                                ChangePasswordDto.builder()
+                                                        .build()
+                                        )
+                                )
+                )
+                .andExpect(status().isNoContent())
+                .andExpect(status().reason("Password successfully changed"));
+    }
+
+    @Test
     @DisplayName("Delete employee test")
-    @WithMockUser(roles = {"MANAGER"})
+    @WithMockUser(roles = "MANAGER")
     void deleteEmployeeTest() throws Exception {
         doNothing().when(employeeService).deleteEmployeeById(any(UUID.class));
 

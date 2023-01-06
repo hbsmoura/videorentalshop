@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/bookings")
+@PreAuthorize("hasRole('EMPLOYEE')")
 public class BookingController {
 
     private final BookingService bookingService;
@@ -23,6 +25,7 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('CLIENT')")
     public BookingDto createBooking(@RequestBody BookingDto givenBooking) {
         return bookingService.createBooking(givenBooking);
     }
@@ -43,11 +46,13 @@ public class BookingController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('MANAGER')")
     public BookingDto updateBooking(@RequestBody BookingDto givenBooking) {
         return bookingService.updateBooking(givenBooking);
     }
 
     @PatchMapping("/cancel/{id}")
+    @PreAuthorize("hasRole('CLIENT')")
     public BookingDto cancelBookingById(@PathVariable("id") UUID id) {
         return bookingService.cancelBookingById(id);
     }
@@ -63,6 +68,7 @@ public class BookingController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Booking with given Id successfully deleted")
     public void deleteBookingById(@PathVariable UUID id) {
         bookingService.deleteBookingById(id);
