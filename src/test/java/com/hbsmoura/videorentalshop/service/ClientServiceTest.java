@@ -1,8 +1,10 @@
 package com.hbsmoura.videorentalshop.service;
 
+import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
 import com.hbsmoura.videorentalshop.exceptions.ClientNotFoundException;
+import com.hbsmoura.videorentalshop.exceptions.PasswordNotMachException;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.repository.ClientRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +61,6 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Create client test")
-    @WithMockUser(roles = {"CLIENT"})
     void createClientTest() {
         doReturn(mockedClient.getPassword()).when(passwordEncoder).encode(anyString());
         doReturn(mockedClient).when(clientRepository).save(any(Client.class));
@@ -77,7 +78,6 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Paging list of clients test")
-    @WithMockUser(roles = {"EMPLOYEE"})
     void listClientsTest() {
         ClientDto mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
 
@@ -91,7 +91,6 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Find client by the given id test")
-    @WithMockUser(roles = {"EMPLOYEE"})
     void getClientById() {
         doReturn(Optional.of(mockedClient)).when(clientRepository).findById(any(UUID.class));
 
@@ -105,7 +104,6 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Find client by the given id throw exception test")
-    @WithMockUser(roles = {"EMPLOYEE"})
     void getClientByIdThrowExceptionTest() {
         doReturn(Optional.empty()).when(clientRepository).findById(any(UUID.class));
 
@@ -114,7 +112,6 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Search client by name or username test")
-    @WithMockUser(roles = {"EMPLOYEE"})
     void searchClientByNameOrUsernameTest() {
         ClientDto mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
 
@@ -132,7 +129,6 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Update client test")
-    @WithMockUser(roles = {"CLIENT"})
     void updateClientTest() {
         ClientLoginDto mockedClientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
 
@@ -150,13 +146,54 @@ class ClientServiceTest {
 
     @Test
     @DisplayName("Update client throw exception test")
-    @WithMockUser(roles = {"EMPLOYEE"})
     void updateClientThrowExceptionTest() {
         ClientLoginDto mockedClientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
 
         doReturn(Optional.empty()).when(clientRepository).findById(any(UUID.class));
 
         assertThrows(ClientNotFoundException.class, () -> clientService.updateClient(mockedClientLoginDto));
+    }
+
+    @Test
+    @DisplayName("Chane password test")
+    void changePasswordTest() {
+        doReturn(Optional.of(mockedClient)).when(clientRepository).findById(any(UUID.class));
+        doReturn(true).when(passwordEncoder).matches(anyString(), anyString());
+        doReturn(mockedClient).when(clientRepository).save(any(Client.class));
+
+        clientService.changePassword(
+                mockedClient.getId(),
+                ChangePasswordDto.builder()
+                        .currentPassword("someOldPassword")
+                        .newPassword("someNewPassword")
+                        .build()
+        );
+
+        verify(clientRepository, times(1)).findById(any(UUID.class));
+        verify(clientRepository, times(1)).save(any(Client.class));
+    }
+
+    @Test
+    @DisplayName("Change password throw ClientNotFoundException test")
+    void changePasswordThrowClientNotFoundExceptionTest() {
+        assertThrows(
+                ClientNotFoundException.class,
+                () -> clientService.changePassword(null, ChangePasswordDto.builder().build())
+        );
+    }
+
+    @Test
+    @DisplayName("Change password throw PasswordNotMachException test")
+    void changePasswordThrowPasswordNotMachExceptionExceptionTest() {
+        doReturn(Optional.of(mockedClient)).when(clientRepository).findById(any(UUID.class));
+
+        assertThrows(
+                PasswordNotMachException.class,
+                () -> clientService.changePassword(
+                        UUID.randomUUID(),
+                        ChangePasswordDto.builder().build()
+                )
+        );
     }
 
     @Test

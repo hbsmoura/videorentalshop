@@ -1,8 +1,10 @@
 package com.hbsmoura.videorentalshop.service;
 
+import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
 import com.hbsmoura.videorentalshop.exceptions.EmployeeNotFoundException;
+import com.hbsmoura.videorentalshop.exceptions.PasswordNotMachException;
 import com.hbsmoura.videorentalshop.model.Employee;
 import com.hbsmoura.videorentalshop.repository.EmployeeRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -124,7 +126,7 @@ class EmployeeServiceTest {
         doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
         doReturn(mockedEmployee).when(employeeRepository).save(any(Employee.class));
 
-        EmployeeLoginDto returnedEmployeeDto = employeeService.updateEmployee(mockedEmployeeLoginDto);
+        EmployeeDto returnedEmployeeDto = employeeService.updateEmployee(mockedEmployeeLoginDto);
 
         assertThat(returnedEmployeeDto.getId(), is(mockedEmployee.getId()));
         assertThat(returnedEmployeeDto.getName(), is(mockedEmployee.getName()));
@@ -160,6 +162,48 @@ class EmployeeServiceTest {
         doReturn(Optional.empty()).when(employeeRepository).findById(any(UUID.class));
 
         assertThrows(EmployeeNotFoundException.class, () -> employeeService.setManagement(UUID.randomUUID(), true));
+    }
+
+    @Test
+    @DisplayName("Chane password test")
+    void changePasswordTest() {
+        doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
+        doReturn(true).when(passwordEncoder).matches(anyString(), anyString());
+        doReturn(mockedEmployee).when(employeeRepository).save(any(Employee.class));
+
+        employeeService.changePassword(
+                mockedEmployee.getId(),
+                ChangePasswordDto.builder()
+                        .currentPassword("someOldPassword")
+                        .newPassword("someNewPassword")
+                        .build()
+        );
+
+        verify(employeeRepository, times(1)).findById(any(UUID.class));
+        verify(employeeRepository, times(1)).save(any(Employee.class));
+    }
+
+    @Test
+    @DisplayName("Change password throw ClientNotFoundException test")
+    void changePasswordThrowClientNotFoundExceptionTest() {
+        assertThrows(
+                EmployeeNotFoundException.class,
+                () -> employeeService.changePassword(null, ChangePasswordDto.builder().build())
+        );
+    }
+
+    @Test
+    @DisplayName("Change password throw PasswordNotMachException test")
+    void changePasswordThrowPasswordNotMachExceptionExceptionTest() {
+        doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
+
+        assertThrows(
+                PasswordNotMachException.class,
+                () -> employeeService.changePassword(
+                        UUID.randomUUID(),
+                        ChangePasswordDto.builder().build()
+                )
+        );
     }
 
     @Test

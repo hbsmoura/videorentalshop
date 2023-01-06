@@ -1,8 +1,10 @@
 package com.hbsmoura.videorentalshop.service;
 
+import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
 import com.hbsmoura.videorentalshop.exceptions.ClientNotFoundException;
+import com.hbsmoura.videorentalshop.exceptions.PasswordNotMachException;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.repository.ClientRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -107,12 +109,30 @@ public class ClientService {
 
         client.setName(givenClient.getName());
         client.setUsername(givenClient.getUsername());
-        client.setPassword(givenClient.getPassword());
-        client.setBookings(givenClient.getBookings());
 
         clientRepository.save(client);
 
         return new ModelMapper().map(client, ClientLoginDto.class);
+    }
+
+    /**
+     * Method for change the password of a client.
+     * @param id the given id
+     * @param changePasswordDto object containing the client's id, the current password and the new one
+     * @throws ClientNotFoundException if there is no client with the given id on the model layer
+     * @throws PasswordNotMachException if the given current password does not match with the saved one
+     */
+
+
+    public void changePassword(UUID id, ChangePasswordDto changePasswordDto) {
+        Client client = clientRepository.findById(id).orElseThrow(ClientNotFoundException::new);
+
+        if (!passwordEncoder.matches(changePasswordDto.getCurrentPassword(), client.getPassword()))
+            throw new PasswordNotMachException();
+
+        client.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+
+        clientRepository.save(client);
     }
 
     /**

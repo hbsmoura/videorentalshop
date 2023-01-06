@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/movies")
+@PreAuthorize("permitAll()")
 public class MovieController {
 
     private final MovieService movieService;
@@ -23,6 +25,7 @@ public class MovieController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public MovieDto createMovie(@RequestBody MovieDto givenMovie) {
         return movieService.createMovie(givenMovie);
     }
@@ -53,11 +56,13 @@ public class MovieController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public MovieDto updateMovie(@RequestBody MovieDto givenMovie) {
         return movieService.updateMovie(givenMovie);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Movie with given Id successfully deleted")
     public void deleteMovie(@PathVariable("id") UUID id) {
         movieService.deleteMovieById(id);

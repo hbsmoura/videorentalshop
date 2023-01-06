@@ -1,5 +1,6 @@
 package com.hbsmoura.videorentalshop.controller;
 
+import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
 import com.hbsmoura.videorentalshop.service.EmployeeService;
@@ -7,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/employees")
+@PreAuthorize("hasRole('MANAGER')")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -44,13 +47,21 @@ public class EmployeeController {
     }
 
     @PutMapping
-    public EmployeeLoginDto updateEmployee(@RequestBody EmployeeLoginDto givenEmployee) {
+    @PreAuthorize("hasRole('EMPLOYEE') and @userService.isItself(#givenEmployee.id)")
+    public EmployeeDto updateEmployee(@RequestBody EmployeeLoginDto givenEmployee) {
         return employeeService.updateEmployee(givenEmployee);
     }
 
     @PatchMapping("/{id}/management/{set}")
     public EmployeeDto setManagement(@PathVariable("id") UUID id, @PathVariable("set") boolean set) {
         return employeeService.setManagement(id, set);
+    }
+
+    @PatchMapping("/{id}/password")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Password successfully changed")
+    @PreAuthorize("hasRole('EMPLOYEE') and @userService.isItself(#id)")
+    public void changePassword(@PathVariable("id") UUID id, ChangePasswordDto changePasswordDto) {
+        employeeService.changePassword(id, changePasswordDto);
     }
 
     @DeleteMapping("/{id}")

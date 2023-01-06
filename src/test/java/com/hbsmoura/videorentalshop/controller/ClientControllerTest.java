@@ -3,24 +3,29 @@ package com.hbsmoura.videorentalshop.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hbsmoura.videorentalshop.config.security.SecurityConfigTest;
+import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.service.ClientService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,8 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(value = ClientController.class)
+@Import(SecurityConfigTest.class)
 class ClientControllerTest {
 
     @Autowired
@@ -46,20 +51,30 @@ class ClientControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @MockBean
     private ClientService clientService;
 
-    private final Client mockedClient = Client.builder()
-            .id(UUID.randomUUID())
-            .name("Mocked Name")
-            .username("mockeduser")
-            .password(new BCryptPasswordEncoder().encode("pass"))
-            .build();
+    private Client mockedClient;
+    private ClientDto mockedClientDto;
 
-    private final ClientDto mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
+    @BeforeEach
+    public void setup() {
+        mockedClient = Client.builder()
+                .id(UUID.fromString("40036fd4-9090-480b-8125-142a85794d4f"))
+                .name("Mocked Name")
+                .username("mockeduser")
+                .password(passwordEncoder.encode("pass"))
+                .build();
+
+        mockedClientDto = new ModelMapper().map(mockedClient, ClientDto.class);
+    }
 
     @Test
     @DisplayName("Create client test")
+    @WithAnonymousUser
     void createClientTest() throws Exception {
         ClientLoginDto ClientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
 
@@ -125,9 +140,10 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Update client test")
-    @WithMockUser(roles = "CLIENT")
+    @WithUserDetails(value = "mockedclient", userDetailsServiceBeanName = "userService")
     void updateClientTest() throws Exception {
         ClientLoginDto clientLoginDto = new ModelMapper().map(mockedClient, ClientLoginDto.class);
+
         doReturn(clientLoginDto).when(clientService).updateClient(any(ClientLoginDto.class));
 
         mockMvc
@@ -138,6 +154,27 @@ class ClientControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(clientLoginDto)));
+    }
+
+    @Test
+    @DisplayName("Change password test")
+    @WithUserDetails(value = "mockedclient", userDetailsServiceBeanName = "userService")
+    void changePasswordTest() throws Exception {
+        doNothing().when(clientService).changePassword(any(UUID.class), any(ChangePasswordDto.class));
+
+        mockMvc
+                .perform(
+                        patch("/clients/"+ mockedClient.getId() +"/password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        mapper.writeValueAsString(
+                                                ChangePasswordDto.builder()
+                                                        .build()
+                                        )
+                                )
+                )
+                .andExpect(status().isNoContent())
+                .andExpect(status().reason("Password successfully changed"));
     }
 
     @Test
