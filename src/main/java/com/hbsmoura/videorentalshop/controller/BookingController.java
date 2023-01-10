@@ -36,12 +36,12 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    public BookingDto getBookingById(@PathVariable("id") UUID id) {
+    public BookingDto getBookingById(@PathVariable UUID id) {
         return bookingService.getBookingById(id);
     }
 
     @GetMapping("/search/state/{state}")
-    public Page<BookingDto> searchBookingsByState(@PathVariable("state") String state, Pageable pageable) {
+    public Page<BookingDto> searchBookingsByState(@PathVariable String state, Pageable pageable) {
         return bookingService.searchBookingsByState(state, pageable);
     }
 
@@ -53,7 +53,7 @@ public class BookingController {
 
     @PatchMapping("/cancel/{id}")
     @PreAuthorize("hasRole('CLIENT')")
-    public BookingDto cancelBookingById(@PathVariable("id") UUID id) {
+    public BookingDto cancelBookingById(@PathVariable UUID id) {
         return bookingService.cancelBookingById(id);
     }
 

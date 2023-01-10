@@ -1,6 +1,6 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.exceptions.UserIdNotFoundException;
+import com.hbsmoura.videorentalshop.exceptions.UserNotFoundException;
 import com.hbsmoura.videorentalshop.model.User;
 import com.hbsmoura.videorentalshop.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -29,7 +29,7 @@ public class UserService implements UserDetailsService {
 
     public boolean isItself(UUID id) {
         User user = userRepository.findById(id).orElseThrow(
-                () -> new UserIdNotFoundException("User not found with this id: " + id)
+                () -> new UserNotFoundException("User not found with this id: " + id)
         );
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

@@ -41,7 +41,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public ClientDto getClientById(@PathVariable("id") UUID id) {
+    public ClientDto getClientById(@PathVariable UUID id) {
         return clientService.getClientById(id);
     }
 
@@ -59,14 +59,14 @@ public class ClientController {
     @PatchMapping("/{id}/password")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Password successfully changed")
     @PreAuthorize("hasRole('CLIENT') and @userService.isItself(#id)")
-    public void changePassword(@PathVariable("id") UUID id, ChangePasswordDto changePasswordDto) {
+    public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
         clientService.changePassword(id, changePasswordDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Client with given Id successfully deleted")
     @PreAuthorize("hasRole('MANAGER')")
-    public void deleteClient(@PathVariable("id") UUID id) {
+    public void deleteClient(@PathVariable UUID id) {
         clientService.deleteClientById(id);
     }
 }

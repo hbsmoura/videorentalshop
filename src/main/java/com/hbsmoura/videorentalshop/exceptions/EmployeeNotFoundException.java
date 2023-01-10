@@ -5,4 +5,8 @@ public class EmployeeNotFoundException extends RuntimeException {
     public EmployeeNotFoundException() {
         super("There is no Employee with the informed Id");
     }
+
+    public EmployeeNotFoundException(String msg) {
+        super(msg);
+    }
 }
