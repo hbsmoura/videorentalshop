@@ -1,7 +1,7 @@
 package com.hbsmoura.videorentalshop.service;
 
 import com.hbsmoura.videorentalshop.config.security.SecurityConfigTest;
-import com.hbsmoura.videorentalshop.exceptions.UserIdNotFoundException;
+import com.hbsmoura.videorentalshop.exceptions.UserNotFoundException;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.model.User;
 import com.hbsmoura.videorentalshop.repository.UserRepository;
@@ -98,7 +98,7 @@ public class UserServiceTest {
     @DisplayName("Is itself throw UsernameNotFoundException test")
     void isItselfThrowUsernameNotFoundExceptionTest() {
         assertThrows(
-                UserIdNotFoundException.class,
+                UserNotFoundException.class,
                 () -> userService.isItself(UUID.randomUUID())
         );
     }

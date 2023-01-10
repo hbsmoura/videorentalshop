@@ -25,7 +25,7 @@ import java.util.UUID;
 public class Booking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne(cascade = CascadeType.MERGE)

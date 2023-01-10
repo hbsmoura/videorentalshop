@@ -36,22 +36,22 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public MovieDto getMovieById(@PathVariable("id") UUID id) {
+    public MovieDto getMovieById(@PathVariable UUID id) {
         return movieService.getMovieById(id);
     }
 
     @GetMapping("/search/{text}")
-    public Page<MovieDto> searchMoviesByTitleDirectionOrInfo(@PathVariable("text") String text, Pageable pageable) {
+    public Page<MovieDto> searchMoviesByTitleDirectionOrInfo(@PathVariable String text, Pageable pageable) {
         return movieService.searchMoviesByTitleOrDirectionOrInfo(text, pageable);
     }
 
     @GetMapping("/search/genre/{genre}")
-    public Page<MovieDto> searchMoviesByGenre(@PathVariable("genre") String genre, Pageable pageable) {
+    public Page<MovieDto> searchMoviesByGenre(@PathVariable String genre, Pageable pageable) {
         return movieService.searchMoviesByGenre(genre, pageable);
     }
 
     @GetMapping("/search/theme/{theme}")
-    public Page<MovieDto> searchMoviesByTheme(@PathVariable("theme") String theme, Pageable pageable) {
+    public Page<MovieDto> searchMoviesByTheme(@PathVariable String theme, Pageable pageable) {
         return movieService.searchMoviesByTheme(theme, pageable);
     }
 
@@ -64,7 +64,7 @@ public class MovieController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Movie with given Id successfully deleted")
-    public void deleteMovie(@PathVariable("id") UUID id) {
+    public void deleteMovie(@PathVariable UUID id) {
         movieService.deleteMovieById(id);
     }
 }

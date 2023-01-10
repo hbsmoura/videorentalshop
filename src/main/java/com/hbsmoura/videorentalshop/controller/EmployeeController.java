@@ -37,7 +37,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public EmployeeDto getEmployeeById(@PathVariable("id") UUID id) {
+    public EmployeeDto getEmployeeById(@PathVariable UUID id) {
         return employeeService.getEmployeeById(id);
     }
 
@@ -53,20 +53,20 @@ public class EmployeeController {
     }
 
     @PatchMapping("/{id}/management/{set}")
-    public EmployeeDto setManagement(@PathVariable("id") UUID id, @PathVariable("set") boolean set) {
+    public EmployeeDto setManagement(@PathVariable UUID id, @PathVariable("set") boolean set) {
         return employeeService.setManagement(id, set);
     }
 
     @PatchMapping("/{id}/password")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Password successfully changed")
     @PreAuthorize("hasRole('EMPLOYEE') and @userService.isItself(#id)")
-    public void changePassword(@PathVariable("id") UUID id, ChangePasswordDto changePasswordDto) {
+    public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
         employeeService.changePassword(id, changePasswordDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Employee with given Id successfully deleted")
-    public void deleteEmployee(@PathVariable("id") UUID id) {
+    public void deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployeeById(id);
     }
 }

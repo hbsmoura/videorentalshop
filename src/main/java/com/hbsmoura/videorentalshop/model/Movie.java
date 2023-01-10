@@ -23,7 +23,7 @@ import java.util.UUID;
 public class Movie {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private UUID id;
 
     @Column(nullable = false, unique = true)
