@@ -233,20 +233,25 @@ public class BookingService {
 
         booking.setActualDevolution(LocalDate.now());
         booking.setDevolutionAssignor(assingor);
-        booking.setState(EnumBookingState.FINALIZED);
 
         if (booking.getState() == EnumBookingState.RENTED) {
+            Period period = Period.between(booking.getEstimatedDevolution(), booking.getActualDevolution());
+
             booking.setPenalty(
+                    period.isNegative() ? BigDecimal.ZERO :
                     movie.getValuePerDay().multiply(
                             new BigDecimal(
-                                    Period.between(booking.getRentStart(), booking.getActualDevolution()).getDays()
+                                    period.getDays()
                             )
                     )
             );
+
             movie.setQuantityAvailable(movie.getQuantityAvailable()+1);
         } else {
             booking.setPenalty(new BigDecimal(0).subtract(booking.getRegularPrice()));
         }
+
+        booking.setState(EnumBookingState.FINALIZED);
 
         movieRepository.save(movie);
         Booking savedBooking = bookingRepository.save(booking);

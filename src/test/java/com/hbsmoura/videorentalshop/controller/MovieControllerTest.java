@@ -3,7 +3,8 @@ package com.hbsmoura.videorentalshop.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.hbsmoura.videorentalshop.config.security.SecurityConfigTest;
+import com.hbsmoura.videorentalshop.config.security.FakeSecurityConfig;
+import com.hbsmoura.videorentalshop.config.security.JwtAuthenticationFilter;
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
 import com.hbsmoura.videorentalshop.model.Movie;
@@ -16,12 +17,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,8 +43,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(value = MovieController.class)
-@Import(SecurityConfigTest.class)
+@WebMvcTest(
+        value = MovieController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = JwtAuthenticationFilter.class
+        )
+)
+@Import(FakeSecurityConfig.class)
 class MovieControllerTest {
 
     @Autowired
@@ -50,9 +58,6 @@ class MovieControllerTest {
 
     @Autowired
     private ObjectMapper mapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @MockBean
     private MovieService movieService;

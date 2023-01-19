@@ -9,16 +9,19 @@ import com.hbsmoura.videorentalshop.service.EmployeeService;
 import com.hbsmoura.videorentalshop.service.MovieService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 
 import static com.hbsmoura.videorentalshop.enums.EnumMovieGenre.*;
 
-//@Configuration
+@Component
 public class DataTest {
     private final ClientService clientService;
     private final MovieService movieService;
@@ -33,7 +36,7 @@ public class DataTest {
         this.bookingService = bookingService;
     }
 
-//    @Bean
+    @Bean
     void populate() {
         ClientLoginDto client1 = clientService.createClient(
                 ClientDto.builder()
@@ -88,6 +91,16 @@ public class DataTest {
                         .build()
         );
 
+        List<ClientLoginDto> clientList = Arrays.asList(client1, client2, client3);
+        List<EmployeeLoginDto> employeeList = Arrays.asList(employee1, employee2, employee3, employee4);
+
+        System.out.println();
+        System.out.println("***** Test users *****");
+        clientList.forEach(System.out::println);
+        employeeList.forEach(System.out::println);
+        System.out.println("******************************");
+        System.out.println();
+
         MovieDto movie1 = movieService.createMovie(
                 MovieDto.builder()
                         .title("Pulp Fiction")
@@ -96,7 +109,7 @@ public class DataTest {
                         .year(1994)
                         .info("The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.")
                         .totalQuantity(3)
-                        .valuePerDay(new BigDecimal(1.2))
+                        .valuePerDay(new BigDecimal("1.2"))
                         .genres(EnumSet.of(ACTION, CRIME, DRAMA))
                         .themes(new HashSet<>(Arrays.asList("Bang bang", "Mafia", "Morality", "Revenge", "Violence")))
                         .build()
@@ -110,7 +123,7 @@ public class DataTest {
                         .year(1980)
                         .info("Jack Torrance becomes winter caretaker at the isolated Overlook Hotel in Colorado, hoping to cure his writer's block. He settles in along with his wife, Wendy, and his son, Danny, who is plagued by psychic premonitions")
                         .totalQuantity(3)
-                        .valuePerDay(new BigDecimal(1.3))
+                        .valuePerDay(new BigDecimal("1.3"))
                         .genres(EnumSet.of(THRILLER, HORROR, MYSTERY))
                         .themes(new HashSet<>(Arrays.asList(
                                 "Fear", "Insanity", "Madness", "Murder", "Paranormal Activity", "Revenge", "Violence"
@@ -126,7 +139,7 @@ public class DataTest {
                         .year(2012)
                         .info("With the help of a German bounty-hunter, a freed slave sets out to rescue his wife from a brutal plantation-owner in Mississippi")
                         .totalQuantity(4)
-                        .valuePerDay(new BigDecimal(1.1))
+                        .valuePerDay(new BigDecimal("1.1"))
                         .genres(EnumSet.of(ACTION, DRAMA, HISTORICAL, WESTERN))
                         .themes(new HashSet<>(Arrays.asList("Bang bang", "Morality", "Power", "Racism", "Revenge", "Slavery", "Violence")))
                         .build()

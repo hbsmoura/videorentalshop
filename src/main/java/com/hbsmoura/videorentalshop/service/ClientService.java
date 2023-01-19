@@ -51,9 +51,6 @@ public class ClientService {
                 .bookings(new ArrayList<>())
                 .build();
 
-        // Only for test
-//        System.out.println("Client: " + newClient.getUsername() + " - Password: " + randomPass);
-
         Client savedClient = clientRepository.save(newClient);
 
         ClientLoginDto clientToBeReturned = new ModelMapper().map(savedClient, ClientLoginDto.class);

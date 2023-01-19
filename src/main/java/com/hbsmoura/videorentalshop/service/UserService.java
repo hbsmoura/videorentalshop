@@ -3,16 +3,13 @@ package com.hbsmoura.videorentalshop.service;
 import com.hbsmoura.videorentalshop.exceptions.UserNotFoundException;
 import com.hbsmoura.videorentalshop.model.User;
 import com.hbsmoura.videorentalshop.repository.UserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service("userService")
+@Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
@@ -20,22 +17,31 @@ public class UserService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Method for retrieve a user with given username
+     * @param username the given username
+     * @return the retrieved user
+     * @throws UsernameNotFoundException if there is no user with the given username on the model layer
+     *
+     */
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User not found with this username: " + username)
         );
     }
 
-    public boolean isItself(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(
+    /**
+     * Method for retrieve a user with given id
+     * @param id the given id
+     * @return the retrieved user
+     * @throws UserNotFoundException if there is no user with the given id on the model layer
+     *
+     */
+    public User loadUserById(UUID id) {
+        return userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User not found with this id: " + id)
         );
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String username = user.getUsername();
-        String authenticationName = authentication.getName();
-
-        return username.equals(authenticationName);
     }
 }

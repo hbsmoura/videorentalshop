@@ -11,13 +11,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.UUID;
 
 @TestConfiguration
 @EnableMethodSecurity
-public class SecurityConfigTest {
+public class FakeSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -52,6 +53,11 @@ public class SecurityConfigTest {
                 .password(passwordEncoder().encode("pass"))
                 .build();
 
-        return new CustomUserDetailsServiceTest(employee, client);
+        return new InMemoryUserDetailsManager(employee, client);
+    }
+
+    @Bean
+    public FakeAuthService authService() {
+        return new FakeAuthService();
     }
 }

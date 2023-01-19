@@ -1,6 +1,6 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.config.security.SecurityConfigTest;
+import com.hbsmoura.videorentalshop.config.security.FakeSecurityConfig;
 import com.hbsmoura.videorentalshop.exceptions.UserNotFoundException;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.model.User;
@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,10 +29,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-@Import(SecurityConfigTest.class)
+@Import(FakeSecurityConfig.class)
 public class UserServiceTest {
 
     @InjectMocks
@@ -81,25 +80,22 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Is itself test")
-    void isItselfTest() {
+    @DisplayName("Load user by id test")
+    void loadUserByIdTest() {
         doReturn(Optional.of(mockedUser)).when(userRepository).findById(any(UUID.class));
-        doReturn(authentication).when(securityContext).getAuthentication();
 
-        SecurityContextHolder.setContext(securityContext);
+        UserDetails returnedUser = userService.loadUserById(UUID.randomUUID());
 
-        userService.isItself(mockedUser.getId());
-
-        verify(userRepository, times(1)).findById(any(UUID.class));
-        verify(securityContext, times(1)).getAuthentication();
+        assertThat(returnedUser.getUsername(), is(mockedUser.getUsername()));
+        passwordEncoder.matches("pass", returnedUser.getPassword());
     }
 
     @Test
-    @DisplayName("Is itself throw UsernameNotFoundException test")
-    void isItselfThrowUsernameNotFoundExceptionTest() {
+    @DisplayName("Load user by id throw UsernameNotFoundException test")
+    void loadUserByIdThrowUsernameNotFoundExceptionTest() {
         assertThrows(
                 UserNotFoundException.class,
-                () -> userService.isItself(UUID.randomUUID())
+                () -> userService.loadUserById(UUID.randomUUID())
         );
     }
 }

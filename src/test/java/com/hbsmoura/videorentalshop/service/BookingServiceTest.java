@@ -65,7 +65,7 @@ public class BookingServiceTest {
             .duration(120)
             .year(1994)
             .info("Some info from the movie")
-            .valuePerDay(new BigDecimal(1.2))
+            .valuePerDay(new BigDecimal("1.2"))
             .totalQuantity(3)
             .quantityAvailable(2)
             .genres(EnumSet.of(EnumMovieGenre.ADVENTURE, EnumMovieGenre.ROMANCE, EnumMovieGenre.TEEN))
@@ -88,19 +88,10 @@ public class BookingServiceTest {
 
     private Booking mockedBooking = Booking.builder()
             .id(UUID.randomUUID())
-            .renter(mockedClient)
             .movie(mockedMovie)
-            .estimatedDevolution(LocalDate.now().plusDays(3L))
-            .state(EnumBookingState.RENTED)
-            .rentAssignor(mockedEmployee)
-            .rentStart(LocalDate.now())
-            .regularPrice(
-                    mockedMovie.getValuePerDay().multiply(
-                            new BigDecimal(Period.between(
-                                    LocalDate.now(), LocalDate.now().plusDays(3L)
-                            ).getDays())
-                    )
-            )
+            .renter(mockedClient)
+            .estimatedDevolution(LocalDate.now().plusDays(3))
+            .state(EnumBookingState.REQUESTED)
             .build();
 
     private Page<Booking> mockedPageBookings = new PageImpl<>(Collections.singletonList(mockedBooking));
@@ -110,17 +101,9 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Create booking test")
     void createBookingTest() {
-        Booking newMockedBooking = Booking.builder()
-                .id(mockedBooking.getId())
-                .movie(mockedMovie)
-                .renter(mockedClient)
-                .estimatedDevolution(LocalDate.now().plusDays(3))
-                .state(EnumBookingState.REQUESTED)
-                .build();
-
         doReturn(Optional.of(mockedMovie)).when(movieRepository).findById(any(UUID.class));
         doReturn(Optional.of(mockedClient)).when(clientRepository).findById(any(UUID.class));
-        doReturn(newMockedBooking).when(bookingRepository).save(any(Booking.class));
+        doReturn(mockedBooking).when(bookingRepository).save(any(Booking.class));
 
         BookingDto returnedBooking = bookingService.createBooking(mockedBookingDto);
 
@@ -130,6 +113,30 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getRentStart(), is(nullValue()));
         assertThat(returnedBooking.getRentAssignor(), is(nullValue()));
         assertThat(returnedBooking.getEstimatedDevolution(), is(LocalDate.now().plusDays(3)));
+        assertThat(returnedBooking.getActualDevolution(), is(nullValue()));
+        assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
+        assertThat(returnedBooking.getState(), is(EnumBookingState.REQUESTED));
+        assertNull(returnedBooking.getRegularPrice());
+        assertNull(returnedBooking.getPenalty());
+
+    }
+
+    @Test
+    @DisplayName("Create booking without estimated devolution test")
+    void createBookingWithoutEstimatedDevolutionTest() {
+        mockedBooking.setEstimatedDevolution(null);
+        doReturn(Optional.of(mockedMovie)).when(movieRepository).findById(any(UUID.class));
+        doReturn(Optional.of(mockedClient)).when(clientRepository).findById(any(UUID.class));
+        doReturn(mockedBooking).when(bookingRepository).save(any(Booking.class));
+
+        BookingDto returnedBooking = bookingService.createBooking(new ModelMapper().map(mockedBooking, BookingDto.class));
+
+        assertThat(returnedBooking.getId(), is(mockedBooking.getId()));
+        assertThat(returnedBooking.getMovie(), is(mockedMovie));
+        assertThat(returnedBooking.getRenter(), is(mockedClient));
+        assertThat(returnedBooking.getRentStart(), is(nullValue()));
+        assertThat(returnedBooking.getRentAssignor(), is(nullValue()));
+        assertThat(returnedBooking.getEstimatedDevolution(), is(nullValue()));
         assertThat(returnedBooking.getActualDevolution(), is(nullValue()));
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
         assertThat(returnedBooking.getState(), is(EnumBookingState.REQUESTED));
@@ -177,7 +184,7 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getEstimatedDevolution(), is(mockedBooking.getEstimatedDevolution()));
         assertThat(returnedBooking.getActualDevolution(), is(nullValue()));
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
-        assertThat(returnedBooking.getState(), is(EnumBookingState.RENTED));
+        assertThat(returnedBooking.getState(), is(EnumBookingState.REQUESTED));
         assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
         assertNull(returnedBooking.getPenalty());
     }
@@ -224,7 +231,7 @@ public class BookingServiceTest {
         assertThat(returnedBooking.getEstimatedDevolution(), is(mockedBooking.getEstimatedDevolution()));
         assertThat(returnedBooking.getActualDevolution(), is(nullValue()));
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
-        assertThat(returnedBooking.getState(), is(EnumBookingState.RENTED));
+        assertThat(returnedBooking.getState(), is(EnumBookingState.REQUESTED));
         assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
         assertNull(returnedBooking.getPenalty());
     }
@@ -255,29 +262,23 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Cancel booking test")
     void cancelBookingTest() {
-        Booking newMockedBooking = Booking.builder()
-                .id(mockedBooking.getId())
-                .movie(mockedMovie)
-                .renter(mockedClient)
-                .state(EnumBookingState.REQUESTED)
-                .regularPrice(new BigDecimal(3.6d))
-                .build();
+        mockedBooking.setRegularPrice(new BigDecimal("3.6"));
 
-        doReturn(Optional.of(newMockedBooking)).when(bookingRepository).findById(any(UUID.class));
+        doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
 
-        BookingDto returnedBooking = bookingService.cancelBookingById(newMockedBooking.getId());
+        BookingDto returnedBooking = bookingService.cancelBookingById(mockedBooking.getId());
 
         assertThat(returnedBooking.getId(), is(mockedBooking.getId()));
         assertThat(returnedBooking.getMovie(), is(mockedMovie));
         assertThat(returnedBooking.getRenter(), is(mockedClient));
         assertThat(returnedBooking.getRentStart(), is(nullValue()));
         assertThat(returnedBooking.getRentAssignor(), is(nullValue()));
-        assertThat(returnedBooking.getEstimatedDevolution(), is(nullValue()));
+        assertThat(returnedBooking.getEstimatedDevolution(), is(mockedBooking.getEstimatedDevolution()));
         assertThat(returnedBooking.getActualDevolution(), is(nullValue()));
         assertThat(returnedBooking.getDevolutionAssignor(), is(nullValue()));
         assertThat(returnedBooking.getState(), is(EnumBookingState.CANCELED));
-        assertThat(returnedBooking.getRegularPrice(), is(newMockedBooking.getRegularPrice()));
-        assertThat(returnedBooking.getPenalty(), is(newMockedBooking.getPenalty()));
+        assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
+        assertThat(returnedBooking.getPenalty(), is(mockedBooking.getPenalty()));
     }
 
     @Test
@@ -292,6 +293,7 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Cancel booking throw BookingCannotBeUpdatedFromRequestedException test")
     void cancelBookingThrowBookingCannotBeUpdatedFromRequestedExceptionTest() {
+        mockedBooking.setState(EnumBookingState.FINALIZED);
         doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
 
         assertThrows(
@@ -303,21 +305,15 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Start rent test")
     void startRentTest() {
-        Booking newMockedBooking = Booking.builder()
-                .id(mockedBooking.getId())
-                .movie(mockedMovie)
-                .renter(mockedClient)
-                .estimatedDevolution(mockedBooking.getEstimatedDevolution())
-                .rentAssignor(mockedEmployee)
-                .state(EnumBookingState.REQUESTED)
-                .build();
+        mockedBooking.setRentAssignor(mockedEmployee);
+        mockedBooking.setState(EnumBookingState.REQUESTED);
 
-        doReturn(Optional.of(newMockedBooking)).when(bookingRepository).findById(any(UUID.class));
+        doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
         doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
         doReturn(mockedMovie).when(movieRepository).save(any(Movie.class));
         doReturn(mockedBooking).when(bookingRepository).save(any(Booking.class));
 
-        BookingDto returnedBooking = bookingService.startRent(new ModelMapper().map(newMockedBooking, BookingDto.class));
+        BookingDto returnedBooking = bookingService.startRent(new ModelMapper().map(mockedBooking, BookingDto.class));
 
         assertThat(returnedBooking.getId(), is(mockedBooking.getId()));
         assertThat(returnedBooking.getMovie(), is(mockedMovie));
@@ -342,97 +338,173 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Start rent throw EmployeeNotFoundException test")
     void startRentThrowEmployeeNotFoundExceptionTest() {
+        mockedBooking.setRentAssignor(mockedEmployee);
+        mockedBooking.setState(EnumBookingState.REQUESTED);
+
         doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
 
         assertThrows(EmployeeNotFoundException.class,
-                () -> bookingService.startRent(mockedBookingDto));
+                () -> bookingService.startRent(new ModelMapper().map(mockedBooking, BookingDto.class)));
     }
 
     @Test
     @DisplayName("Start rent throw BookingCannotBeUpdatedFromRequestedException test")
     void startRentThrowBookingCannotBeUpdatedFromRequestedExceptionTest() {
+        mockedBooking.setRentAssignor(mockedEmployee);
+        mockedBooking.setState(EnumBookingState.FINALIZED);
+
         doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
         doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
 
         assertThrows(BookingCannotBeUpdatedFromRequestedException.class,
-                () -> bookingService.startRent(mockedBookingDto));
+                () -> bookingService.startRent(new ModelMapper().map(mockedBooking, BookingDto.class)));
     }
     @Test
     @DisplayName("Start rent throw MovieNotAvailableException test")
     void startRentThrowMovieNotAvailableExceptionTest() {
-        Booking newMockedBooking = Booking.builder()
-                .id(mockedBooking.getId())
-                .movie(
-                        Movie.builder()
-                                .id(mockedMovie.getId())
-                                .title("Movie Test")
-                                .direction("Director test")
-                                .duration(120)
-                                .year(1994)
-                                .info("Some info from the movie")
-                                .valuePerDay(new BigDecimal(1.2))
-                                .totalQuantity(3)
-                                .quantityAvailable(0)
-                                .genres(EnumSet.of(EnumMovieGenre.ADVENTURE, EnumMovieGenre.ROMANCE, EnumMovieGenre.TEEN))
-                                .themes(new HashSet<>(Arrays.asList("Friendship", "Love", "Youth")))
-                                .build()
-                )
-                .renter(mockedClient)
-                .state(EnumBookingState.REQUESTED)
-                .build();
+        mockedBooking.setRentAssignor(mockedEmployee);
+        mockedBooking.getMovie().setQuantityAvailable(0);
 
-        doReturn(Optional.of(newMockedBooking)).when(bookingRepository).findById(any(UUID.class));
+        doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
         doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
 
         assertThrows(MovieNotAvailableException.class,
-                () -> bookingService.startRent(mockedBookingDto));
+                () -> bookingService.startRent(new ModelMapper().map(mockedBooking, BookingDto.class)));
     }
 
     @Test
-    @DisplayName("Finalize rent test")
-    void FinalizeRentTest() {
-        Booking newMockedBooking = Booking.builder()
-                .id(mockedBooking.getId())
-                .renter(mockedClient)
-                .movie(mockedMovie)
-                .estimatedDevolution(LocalDate.now().plusDays(3L))
-                .state(EnumBookingState.RENTED)
-                .rentAssignor(mockedEmployee)
-                .rentStart(LocalDate.now().minusDays(1L))
-                .regularPrice(
-                        mockedMovie.getValuePerDay().multiply(
-                                new BigDecimal(
-                                        Period.between(
-                                                LocalDate.now().minusDays(1L),
-                                                LocalDate.now()
-                                        ).getDays()
-                                )
+    @DisplayName("Finalize rent from requested test")
+    void FinalizeRentFromRequestedTest() {
+        mockedBooking.setRentStart(LocalDate.now().minusDays(1L));
+        mockedBooking.setRentAssignor(mockedEmployee);
+        mockedBooking.setRegularPrice(
+                mockedMovie.getValuePerDay().multiply(
+                        new BigDecimal(
+                                Period.between(
+                                        LocalDate.now().minusDays(1L),
+                                        LocalDate.now()
+                                ).getDays()
                         )
                 )
-                .devolutionAssignor(mockedEmployee)
-                .actualDevolution(LocalDate.now())
-                .build();
+        );
+        mockedBooking.setDevolutionAssignor(mockedEmployee);
 
-        BookingDto newDto = new ModelMapper().map(newMockedBooking, BookingDto.class);
+        BookingDto newDto = new ModelMapper().map(mockedBooking, BookingDto.class);
 
-        doReturn(Optional.of(newMockedBooking)).when(bookingRepository).findById(any(UUID.class));
+        doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
         doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
         doReturn(mockedMovie).when(movieRepository).save(any(Movie.class));
-        doReturn(newMockedBooking).when(bookingRepository).save(any(Booking.class));
+        doReturn(mockedBooking).when(bookingRepository).save(any(Booking.class));
 
         BookingDto returnedBooking = bookingService.finalizeRent(newDto);
 
-        assertThat(returnedBooking.getId(), is(newMockedBooking.getId()));
+        assertThat(returnedBooking.getId(), is(mockedBooking.getId()));
         assertThat(returnedBooking.getMovie(), is(mockedMovie));
         assertThat(returnedBooking.getRenter(), is(mockedClient));
-        assertThat(returnedBooking.getRentStart(), is(newMockedBooking.getRentStart()));
+        assertThat(returnedBooking.getRentStart(), is(mockedBooking.getRentStart()));
         assertThat(returnedBooking.getRentAssignor(), is(mockedEmployee));
         assertThat(returnedBooking.getEstimatedDevolution(), is(mockedBooking.getEstimatedDevolution()));
-        assertThat(returnedBooking.getActualDevolution(), is(newMockedBooking.getActualDevolution()));
+        assertThat(returnedBooking.getActualDevolution(), is(mockedBooking.getActualDevolution()));
         assertThat(returnedBooking.getDevolutionAssignor(), is(mockedEmployee));
         assertThat(returnedBooking.getState(), is(EnumBookingState.FINALIZED));
-        assertThat(returnedBooking.getRegularPrice(), is(newMockedBooking.getRegularPrice()));
-        assertThat(returnedBooking.getPenalty(), is(new BigDecimal(0).subtract(newMockedBooking.getRegularPrice())));
+        assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
+        assertThat(returnedBooking.getPenalty(), is(BigDecimal.ZERO.subtract(mockedBooking.getRegularPrice())));
+        assertThat(
+                returnedBooking.getRegularPrice()
+                        .add(returnedBooking.getPenalty())
+                        .compareTo(BigDecimal.ZERO),
+                is(0));
+    }
+
+    @Test
+    @DisplayName("Finalize rent from rented test")
+    void FinalizeRentFromRentedTest() {
+        mockedBooking.setRentStart(LocalDate.now().minusDays(1L));
+        mockedBooking.setRentAssignor(mockedEmployee);
+        mockedBooking.setRegularPrice(
+                mockedMovie.getValuePerDay().multiply(
+                        new BigDecimal(
+                                Period.between(
+                                        LocalDate.now().minusDays(1L),
+                                        LocalDate.now()
+                                ).getDays()
+                        )
+                )
+        );
+        mockedBooking.setDevolutionAssignor(mockedEmployee);
+        mockedBooking.setState(EnumBookingState.RENTED);
+
+        BookingDto newDto = new ModelMapper().map(mockedBooking, BookingDto.class);
+
+        doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
+        doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
+        doReturn(mockedMovie).when(movieRepository).save(any(Movie.class));
+        doReturn(mockedBooking).when(bookingRepository).save(any(Booking.class));
+
+        BookingDto returnedBooking = bookingService.finalizeRent(newDto);
+
+        assertThat(returnedBooking.getId(), is(mockedBooking.getId()));
+        assertThat(returnedBooking.getMovie(), is(mockedMovie));
+        assertThat(returnedBooking.getRenter(), is(mockedClient));
+        assertThat(returnedBooking.getRentStart(), is(mockedBooking.getRentStart()));
+        assertThat(returnedBooking.getRentAssignor(), is(mockedEmployee));
+        assertThat(returnedBooking.getEstimatedDevolution(), is(mockedBooking.getEstimatedDevolution()));
+        assertThat(returnedBooking.getActualDevolution(), is(mockedBooking.getActualDevolution()));
+        assertThat(returnedBooking.getDevolutionAssignor(), is(mockedEmployee));
+        assertThat(returnedBooking.getState(), is(EnumBookingState.FINALIZED));
+        assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
+        assertThat(returnedBooking.getPenalty(), is(BigDecimal.ZERO));
+        assertThat(
+                returnedBooking.getRegularPrice()
+                        .add(returnedBooking.getPenalty())
+                        .compareTo(mockedBooking.getRegularPrice()),
+                is(0));
+    }
+
+    @Test
+    @DisplayName("Finalize rent from rented with penalty test")
+    void FinalizeRentFromRentedWithPenaltyTest() {
+        mockedBooking.setRentStart(LocalDate.now().minusDays(5));
+        mockedBooking.setRentAssignor(mockedEmployee);
+        mockedBooking.setRegularPrice(
+                mockedMovie.getValuePerDay().multiply(
+                        new BigDecimal(
+                                Period.between(
+                                        LocalDate.now().minusDays(1),
+                                        LocalDate.now()
+                                ).getDays()
+                        )
+                )
+        );
+        mockedBooking.setDevolutionAssignor(mockedEmployee);
+        mockedBooking.setEstimatedDevolution(LocalDate.now().minusDays(2));
+        mockedBooking.setState(EnumBookingState.RENTED);
+
+        BookingDto newDto = new ModelMapper().map(mockedBooking, BookingDto.class);
+
+        doReturn(Optional.of(mockedBooking)).when(bookingRepository).findById(any(UUID.class));
+        doReturn(Optional.of(mockedEmployee)).when(employeeRepository).findById(any(UUID.class));
+        doReturn(mockedMovie).when(movieRepository).save(any(Movie.class));
+        doReturn(mockedBooking).when(bookingRepository).save(any(Booking.class));
+
+        BookingDto returnedBooking = bookingService.finalizeRent(newDto);
+
+        assertThat(returnedBooking.getId(), is(mockedBooking.getId()));
+        assertThat(returnedBooking.getMovie(), is(mockedMovie));
+        assertThat(returnedBooking.getRenter(), is(mockedClient));
+        assertThat(returnedBooking.getRentStart(), is(mockedBooking.getRentStart()));
+        assertThat(returnedBooking.getRentAssignor(), is(mockedEmployee));
+        assertThat(returnedBooking.getEstimatedDevolution(), is(mockedBooking.getEstimatedDevolution()));
+        assertThat(returnedBooking.getActualDevolution(), is(mockedBooking.getActualDevolution()));
+        assertThat(returnedBooking.getDevolutionAssignor(), is(mockedEmployee));
+        assertThat(returnedBooking.getState(), is(EnumBookingState.FINALIZED));
+        assertThat(returnedBooking.getRegularPrice(), is(mockedBooking.getRegularPrice()));
+        assertThat(returnedBooking.getPenalty(), is(new BigDecimal("2.4")));
+        assertThat(
+                returnedBooking.getRegularPrice()
+                        .add(returnedBooking.getPenalty())
+                        .compareTo(new BigDecimal("3.6")),
+                is(0));
     }
 
     @Test
