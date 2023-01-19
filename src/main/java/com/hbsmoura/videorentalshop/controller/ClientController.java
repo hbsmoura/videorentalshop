@@ -9,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -31,7 +29,6 @@ public class ClientController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAnonymous()")
     public ClientLoginDto createClient(@RequestBody ClientDto givenClient) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return clientService.createClient(givenClient);
     }
 
@@ -51,14 +48,14 @@ public class ClientController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('CLIENT') and @userService.isItself(#givenClient.getId)")
+    @PreAuthorize("hasRole('CLIENT') and @authService.isItself(#givenClient.getId)")
     public ClientLoginDto updateClient(@RequestBody ClientLoginDto givenClient) {
         return clientService.updateClient(givenClient);
     }
 
     @PatchMapping("/{id}/password")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Password successfully changed")
-    @PreAuthorize("hasRole('CLIENT') and @userService.isItself(#id)")
+    @PreAuthorize("hasRole('CLIENT') and @authService.isItself(#id)")
     public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
         clientService.changePassword(id, changePasswordDto);
     }

@@ -46,9 +46,6 @@ public class EmployeeService {
                 .manager(givenEmployee.isManager())
                 .build();
 
-        // Only for test
-//        System.out.println("Employee: " + newEmployee.getUsername() + " - Password: " + randomPass);
-
         Employee savedEmployee = employeeRepository.save(newEmployee);
 
         EmployeeLoginDto employeeToBeReturned = new EmployeeLoginDto(savedEmployee);

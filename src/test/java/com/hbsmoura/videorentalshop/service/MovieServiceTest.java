@@ -175,8 +175,33 @@ public class MovieServiceTest {
         assertThat(returnedMovie.getDuration(), is(mockedMovie.getDuration()));
         assertThat(returnedMovie.getYear(), is(mockedMovie.getYear()));
         assertThat(returnedMovie.getInfo(), is(mockedMovie.getInfo()));
-        assertThat(returnedMovie.getTotalQuantity(), is(mockedMovie.getTotalQuantity()));
-        assertThat(returnedMovie.getQuantityAvailable(), is(mockedMovie.getQuantityAvailable()));
+        assertThat(returnedMovie.getTotalQuantity(), is(3));
+        assertThat(returnedMovie.getQuantityAvailable(), is(2));
+        assertThat(returnedMovie.getValuePerDay(), is(mockedMovie.getValuePerDay()));
+        assertThat(returnedMovie.getGenres(), empty());
+        assertThat(returnedMovie.getThemes(), empty());
+    }
+
+    @Test
+    @DisplayName("Update movie with different total quantity test")
+    void updateMovieWithDifferentTotalQuantityTest() {
+        mockedMovieDto.setTotalQuantity(5);
+
+        doReturn(mockedOptionalMovie).when(movieRepository).findById(any(UUID.class));
+        doReturn(
+                new ModelMapper().map(mockedMovieDto, Movie.class)
+        ).when(movieRepository).save(any(Movie.class));
+
+        MovieDto returnedMovie = movieService.updateMovie(mockedMovieDto);
+
+        assertThat(returnedMovie.getId(), is(mockedMovie.getId()));
+        assertThat(returnedMovie.getTitle(), is(mockedMovie.getTitle()));
+        assertThat(returnedMovie.getDirection(), is(mockedMovie.getDirection()));
+        assertThat(returnedMovie.getDuration(), is(mockedMovie.getDuration()));
+        assertThat(returnedMovie.getYear(), is(mockedMovie.getYear()));
+        assertThat(returnedMovie.getInfo(), is(mockedMovie.getInfo()));
+        assertThat(returnedMovie.getTotalQuantity(), is(5));
+        assertThat(returnedMovie.getQuantityAvailable(), is(4));
         assertThat(returnedMovie.getValuePerDay(), is(mockedMovie.getValuePerDay()));
         assertThat(returnedMovie.getGenres(), empty());
         assertThat(returnedMovie.getThemes(), empty());

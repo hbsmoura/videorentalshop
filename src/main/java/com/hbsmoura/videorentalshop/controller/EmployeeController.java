@@ -47,7 +47,7 @@ public class EmployeeController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('EMPLOYEE') and @userService.isItself(#givenEmployee.id)")
+    @PreAuthorize("hasRole('EMPLOYEE') and @authService.isItself(#givenEmployee.id)")
     public EmployeeDto updateEmployee(@RequestBody EmployeeLoginDto givenEmployee) {
         return employeeService.updateEmployee(givenEmployee);
     }
@@ -59,7 +59,7 @@ public class EmployeeController {
 
     @PatchMapping("/{id}/password")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Password successfully changed")
-    @PreAuthorize("hasRole('EMPLOYEE') and @userService.isItself(#id)")
+    @PreAuthorize("hasRole('EMPLOYEE') and @authService.isItself(#id)")
     public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
         employeeService.changePassword(id, changePasswordDto);
     }
