@@ -1,23 +1,39 @@
 package com.hbsmoura.videorentalshop.config.security;
 
 import com.hbsmoura.videorentalshop.enums.EnumUserRole;
+import com.hbsmoura.videorentalshop.exceptions.KeyPairException;
 import com.hbsmoura.videorentalshop.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "39792442264529482B4D6251655468576D5A7134743777217A25432A462D4A614E635266556A586E3272357538782F413F4428472B4B6250655367566B597033";
+    @Value("${security.rsa.private-key}")
+    private String privateKey;
+
+    @Value("${security.rsa.public-key}")
+    private String publicKey;
     private static final long DEFAULT_EXPIRATION = 1000L * 60 * 60;
+
+    private final KeyFactory keyFactory;
+
+    public JwtService() throws NoSuchAlgorithmException {
+        this.keyFactory = KeyFactory.getInstance("RSA");;
+    }
 
     public String generateToken(User user) {
         Date currentTime = new Date(System.currentTimeMillis());
@@ -29,7 +45,7 @@ public class JwtService {
                 .setExpiration(new Date(currentTime.getTime() + DEFAULT_EXPIRATION))
                 .claim("name", user.getName())
                 .claim("authorities", user.getAuthorities())
-                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                .signWith(getPrivateKey())
                 .compact();
     }
 
@@ -48,7 +64,7 @@ public class JwtService {
 
     private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(getPublicKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -60,15 +76,25 @@ public class JwtService {
 
     private boolean isValidToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+    private PrivateKey getPrivateKey() {
+        try {
+            return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey)));
+        } catch (InvalidKeySpecException e) {
+            throw new KeyPairException();
+        }
+    }
+    private PublicKey getPublicKey() {
+        try {
+            return keyFactory.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey)));
+        } catch (InvalidKeySpecException e) {
+            throw new KeyPairException();
+        }
     }
 }
