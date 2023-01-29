@@ -5,18 +5,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class KeyPairTest {
 
     @Test
-    void generateKeyPairTest() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    void generateKeyPairTest() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
 
         // A new keypair with RSA Algorithm and of size 2048
         // To be run only once in these case
@@ -24,27 +27,36 @@ class KeyPairTest {
         generator.initialize(2048);
         KeyPair keyPair = generator.genKeyPair();
 
-        // Base64 String of the public and the private keys
-        // To be stored on a file like application.properties
-        String publicKeyValue = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
-        String privateKeyValue = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+
+        String publicKeyPathString = "src/main/resources/certs/public.der";
+        String privateKeyPathString = "src/main/resources/certs/private.der";
+
+        // Create the key files on the given path
+        // To be run only once or these will override the files everytime
+        //*******************************************
+//        FileOutputStream filePublicKeyOutput = new FileOutputStream(publicKeyPathString);
+//        filePublicKeyOutput.write(publicKey.getEncoded());
+//        filePublicKeyOutput.close();
+//
+//        FileOutputStream filePrivateKeyOutput = new FileOutputStream(privateKeyPathString);
+//        filePrivateKeyOutput.write(privateKey.getEncoded());
+//        filePrivateKeyOutput.close();
+        //*******************************************
+
+        // Retrieve the keys from the files
+        Path publicKeyPath = Paths.get(publicKeyPathString);
+        byte[] publicKeyBytes = Files.readAllBytes(publicKeyPath);
+
+        Path privateKeyPath = Paths.get(privateKeyPathString);
+        byte[] privateKeyBytes = Files.readAllBytes(privateKeyPath);
 
         // For check out the keys format
         // That's how we retrieve keys from strings
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyValue)));
-        PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyValue)));
-
-        // Printing this on terminal you can just copy and paste the generated keys
-        System.out.println();
-        System.out.println("***** Public Key *****");
-        System.out.println(publicKeyValue);
-        System.out.println("*********************************");
-        System.out.println();
-        System.out.println("***** Private Key *****");
-        System.out.println(privateKeyValue);
-        System.out.println("*********************************");
-        System.out.println("");
+        PublicKey returnedPublicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+        PrivateKey returnedPrivateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
 
     }
 }

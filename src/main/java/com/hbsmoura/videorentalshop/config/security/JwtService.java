@@ -5,28 +5,22 @@ import com.hbsmoura.videorentalshop.exceptions.KeyPairException;
 import com.hbsmoura.videorentalshop.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 
 @Service
 public class JwtService {
-
-    @Value("${security.rsa.private-key}")
-    private String privateKey;
-
-    @Value("${security.rsa.public-key}")
-    private String publicKey;
     private static final long DEFAULT_EXPIRATION = 1000L * 60 * 60;
 
     private final KeyFactory keyFactory;
@@ -84,16 +78,24 @@ public class JwtService {
     }
 
     private PrivateKey getPrivateKey() {
+        String privateKeyPathString = "src/main/resources/certs/private.der";
+
         try {
-            return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey)));
-        } catch (InvalidKeySpecException e) {
+            Path privateKeyPath = Paths.get(privateKeyPathString);
+            byte[] privateKeyBytes = Files.readAllBytes(privateKeyPath);
+            return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+        } catch (Exception e) {
             throw new KeyPairException();
         }
     }
     private PublicKey getPublicKey() {
+        String publicKeyPathString = "src/main/resources/certs/public.der";
+
         try {
-            return keyFactory.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey)));
-        } catch (InvalidKeySpecException e) {
+            Path publicKeyPath = Paths.get(publicKeyPathString);
+            byte[] publicKeyBytes = Files.readAllBytes(publicKeyPath);
+            return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+        } catch (Exception e) {
             throw new KeyPairException();
         }
     }
