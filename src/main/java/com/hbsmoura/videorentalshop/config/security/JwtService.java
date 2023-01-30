@@ -16,6 +16,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 
@@ -26,7 +27,7 @@ public class JwtService {
     private final KeyFactory keyFactory;
 
     public JwtService() throws NoSuchAlgorithmException {
-        this.keyFactory = KeyFactory.getInstance("RSA");;
+        this.keyFactory = KeyFactory.getInstance("RSA");
     }
 
     public String generateToken(User user) {
@@ -77,24 +78,35 @@ public class JwtService {
         }
     }
 
-    private PrivateKey getPrivateKey() {
-        String privateKeyPathString = "src/main/resources/certs/private.der";
+    private PublicKey getPublicKey() {
+        String publicKeyPathString = "src/main/resources/certs/public.pem";
 
         try {
-            Path privateKeyPath = Paths.get(privateKeyPathString);
-            byte[] privateKeyBytes = Files.readAllBytes(privateKeyPath);
-            return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+            Path publicPemPath = Paths.get(publicKeyPathString);
+            String publicPem = new String(Files.readAllBytes(publicPemPath));
+
+            String base64ExtractedPublicKey = publicPem.replace("-----BEGIN RSA PUBLIC KEY-----\n", "");
+            base64ExtractedPublicKey = base64ExtractedPublicKey.replace("\n-----END RSA PUBLIC KEY-----", "");
+            byte[] publicKeyBytes = Base64.getDecoder().decode(base64ExtractedPublicKey);
+
+            return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
         } catch (Exception e) {
             throw new KeyPairException();
         }
     }
-    private PublicKey getPublicKey() {
-        String publicKeyPathString = "src/main/resources/certs/public.der";
+
+    private PrivateKey getPrivateKey() {
+        String privateKeyPathString = "src/main/resources/certs/private.pem";
 
         try {
-            Path publicKeyPath = Paths.get(publicKeyPathString);
-            byte[] publicKeyBytes = Files.readAllBytes(publicKeyPath);
-            return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+            Path privatePemPath = Paths.get(privateKeyPathString);
+            String privatePem = new String(Files.readAllBytes(privatePemPath));
+
+            String base64ExtractPrivateKey = privatePem.replace("-----BEGIN RSA PRIVATE KEY-----\n", "");
+            base64ExtractPrivateKey = base64ExtractPrivateKey.replace("\n-----END RSA PRIVATE KEY-----", "");
+            byte[] privateKeyBytes = Base64.getDecoder().decode(base64ExtractPrivateKey);
+
+            return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
         } catch (Exception e) {
             throw new KeyPairException();
         }
