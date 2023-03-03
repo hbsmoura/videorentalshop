@@ -3,6 +3,7 @@ package com.hbsmoura.videorentalshop.dtos;
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
 import com.hbsmoura.videorentalshop.model.Movie;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,21 +28,21 @@ public class MovieDto extends RepresentationModel<MovieDto> {
     @NotBlank
     private String direction;
 
-    @NotBlank
+    @NotNull
     private int duration;
 
-    @NotBlank
+    @NotNull
     private int year;
 
     private String info;
 
-    @NotBlank
+    @NotNull
     private int totalQuantity;
 
-    @NotBlank
+    @NotNull
     private int quantityAvailable;
 
-    @NotBlank
+    @NotNull
     private BigDecimal valuePerDay;
 
     private Set<EnumMovieGenre> genres;

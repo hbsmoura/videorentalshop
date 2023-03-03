@@ -2,6 +2,7 @@ package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.service.MovieService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ public class MovieController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public MovieDto createMovie(@RequestBody MovieDto givenMovie) {
+    public MovieDto createMovie(@RequestBody @Valid MovieDto givenMovie) {
         return movieService.createMovie(givenMovie);
     }
 
@@ -57,7 +58,7 @@ public class MovieController {
 
     @PutMapping
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public MovieDto updateMovie(@RequestBody MovieDto givenMovie) {
+    public MovieDto updateMovie(@RequestBody @Valid MovieDto givenMovie) {
         return movieService.updateMovie(givenMovie);
     }
 

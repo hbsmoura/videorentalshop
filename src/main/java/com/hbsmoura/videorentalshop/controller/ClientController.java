@@ -4,6 +4,7 @@ import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
 import com.hbsmoura.videorentalshop.service.ClientService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public class ClientController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAnonymous()")
-    public ClientLoginDto createClient(@RequestBody ClientDto givenClient) {
+    public ClientLoginDto createClient(@RequestBody @Valid ClientDto givenClient) {
         return clientService.createClient(givenClient);
     }
 
@@ -49,14 +50,14 @@ public class ClientController {
 
     @PutMapping
     @PreAuthorize("hasRole('CLIENT') and @authService.isItself(#givenClient.getId)")
-    public ClientLoginDto updateClient(@RequestBody ClientLoginDto givenClient) {
+    public ClientLoginDto updateClient(@RequestBody @Valid ClientLoginDto givenClient) {
         return clientService.updateClient(givenClient);
     }
 
     @PatchMapping("/{id}/password")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Password successfully changed")
     @PreAuthorize("hasRole('CLIENT') and @authService.isItself(#id)")
-    public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
+    public void changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDto changePasswordDto) {
         clientService.changePassword(id, changePasswordDto);
     }
 
