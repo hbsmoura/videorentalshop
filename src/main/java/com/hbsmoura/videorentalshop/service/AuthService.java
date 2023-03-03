@@ -2,6 +2,7 @@ package com.hbsmoura.videorentalshop.service;
 
 import com.hbsmoura.videorentalshop.config.security.JwtService;
 import com.hbsmoura.videorentalshop.dtos.UserLoginDto;
+import com.hbsmoura.videorentalshop.exceptions.FailedLoginException;
 import com.hbsmoura.videorentalshop.model.User;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,7 +11,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.FailedLoginException;
 import java.util.UUID;
 
 @Service

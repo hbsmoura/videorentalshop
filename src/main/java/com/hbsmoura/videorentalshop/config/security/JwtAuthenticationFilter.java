@@ -1,5 +1,6 @@
 package com.hbsmoura.videorentalshop.config.security;
 
+import com.hbsmoura.videorentalshop.exceptions.InvalidTokenException;
 import com.hbsmoura.videorentalshop.model.User;
 import com.hbsmoura.videorentalshop.service.UserService;
 import jakarta.servlet.FilterChain;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt = authHeader.substring(7);
 
         if (!jwtService.isUsefulToken(jwt))
-            throw new AuthenticationCredentialsNotFoundException("Token expired or incorrect");
+            throw new InvalidTokenException("Token expired or incorrect");
 
         User user = userService.loadUserByUsername(jwtService.extractUsername(jwt));
 

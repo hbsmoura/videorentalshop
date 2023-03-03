@@ -2,6 +2,7 @@ package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.dtos.UserLoginDto;
 import com.hbsmoura.videorentalshop.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public class AuthController {
 
     @PostMapping
     @PreAuthorize("isAnonymous()")
-    public String authenticate(@RequestBody UserLoginDto login) throws LoginException {
+    public String authenticate(@RequestBody @Valid UserLoginDto login) throws LoginException {
         return authService.authenticate(login);
     }
 }

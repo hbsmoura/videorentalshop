@@ -4,6 +4,7 @@ import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
 import com.hbsmoura.videorentalshop.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ public class EmployeeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EmployeeLoginDto createEmployee(@RequestBody EmployeeDto givenEmployee) {
+    public EmployeeLoginDto createEmployee(@RequestBody @Valid EmployeeDto givenEmployee) {
         return employeeService.createEmployee(givenEmployee);
     }
 
@@ -48,7 +49,7 @@ public class EmployeeController {
 
     @PutMapping
     @PreAuthorize("hasRole('EMPLOYEE') and @authService.isItself(#givenEmployee.id)")
-    public EmployeeDto updateEmployee(@RequestBody EmployeeLoginDto givenEmployee) {
+    public EmployeeDto updateEmployee(@RequestBody @Valid EmployeeLoginDto givenEmployee) {
         return employeeService.updateEmployee(givenEmployee);
     }
 

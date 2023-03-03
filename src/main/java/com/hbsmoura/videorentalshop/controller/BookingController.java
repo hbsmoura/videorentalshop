@@ -2,6 +2,7 @@ package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.service.BookingService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ public class BookingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('CLIENT')")
-    public BookingDto createBooking(@RequestBody BookingDto givenBooking) {
+    public BookingDto createBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.createBooking(givenBooking);
     }
 
@@ -47,7 +48,7 @@ public class BookingController {
 
     @PutMapping
     @PreAuthorize("hasRole('MANAGER')")
-    public BookingDto updateBooking(@RequestBody BookingDto givenBooking) {
+    public BookingDto updateBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.updateBooking(givenBooking);
     }
 
@@ -58,12 +59,12 @@ public class BookingController {
     }
 
     @PatchMapping("/start")
-    public BookingDto startRent(@RequestBody BookingDto givenBooking) {
+    public BookingDto startRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.startRent(givenBooking);
     }
 
     @PatchMapping("/finalize")
-    public BookingDto finalizeRent(@RequestBody BookingDto givenBooking) {
+    public BookingDto finalizeRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.finalizeRent(givenBooking);
     }
 
