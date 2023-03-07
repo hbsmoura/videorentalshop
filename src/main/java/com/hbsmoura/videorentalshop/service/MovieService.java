@@ -2,8 +2,6 @@ package com.hbsmoura.videorentalshop.service;
 
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
-import com.hbsmoura.videorentalshop.exceptions.BookingCannotBeFinalizedException;
-import com.hbsmoura.videorentalshop.exceptions.ClientNotFoundException;
 import com.hbsmoura.videorentalshop.exceptions.MovieNotFoundException;
 import com.hbsmoura.videorentalshop.exceptions.NoSuchGenreException;
 import com.hbsmoura.videorentalshop.model.Movie;
@@ -49,7 +47,6 @@ public class MovieService {
      */
 
     public Page<MovieDto> listMovies(Pageable pageable) {
-        if(pageable.getPageNumber() == 0) throw new IllegalArgumentException("Test");
         Page<Movie> movies = movieRepository.findAll(pageable);
         return movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
     }

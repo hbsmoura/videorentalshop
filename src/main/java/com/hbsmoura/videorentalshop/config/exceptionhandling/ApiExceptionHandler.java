@@ -5,6 +5,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,7 +27,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
                     MovieNotFoundException.class,
                     UserNotFoundException.class
     })
-    public ResponseEntity<Object> handleResourceNotFound(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<Object> handleResourceNotFound(Exception ex, WebRequest request) {
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
                 HttpStatus.NOT_FOUND, ex.getMessage(), ""
         );
@@ -43,7 +45,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
             BookingCannotBeUpdatedFromRequestedException.class,
             NoSuchGenreException.class
     })
-    public ResponseEntity<Object> handleBrokenRule(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<Object> handleBrokenRule(Exception ex, WebRequest request) {
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST, ex.getMessage(), ""
         );
@@ -57,11 +59,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
     }
 
     @ExceptionHandler({
+            AuthenticationException.class,
             FailedLoginException.class,
             InvalidTokenException.class,
             PasswordNotMachException.class
     })
-    public ResponseEntity<Object> handleSecurityMismatch(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<Object> handleUnauthorizedRequest(Exception ex, WebRequest request) {
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
                 HttpStatus.UNAUTHORIZED, ex.getMessage(), ""
         );
@@ -70,6 +73,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
                 ex, apiErrorResponse,
                 new HttpHeaders(),
                 HttpStatus.UNAUTHORIZED,
+                request
+        );
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
+                HttpStatus.FORBIDDEN, ex.getMessage(), ""
+        );
+
+        return handleExceptionInternal(
+                ex, apiErrorResponse,
+                new HttpHeaders(),
+                HttpStatus.FORBIDDEN,
                 request
         );
     }
