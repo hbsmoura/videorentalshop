@@ -6,7 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -79,6 +83,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAnonymous = authentication instanceof AnonymousAuthenticationToken;
+        if (isAnonymous) return handleUnauthorizedRequest(
+                new InsufficientAuthenticationException("Full authentication is required to access this resource"), request);
+
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
                 HttpStatus.FORBIDDEN, ex.getMessage(), ""
         );
