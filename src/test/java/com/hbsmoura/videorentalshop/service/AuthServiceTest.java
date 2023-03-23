@@ -4,6 +4,7 @@ import com.hbsmoura.videorentalshop.config.security.JwtService;
 import com.hbsmoura.videorentalshop.dtos.UserLoginDto;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.model.User;
+import com.hbsmoura.videorentalshop.exceptions.FailedLoginException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.security.auth.login.FailedLoginException;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;

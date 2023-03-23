@@ -48,13 +48,18 @@ public class AuthControllerTest {
     @DisplayName("Authenticate user test")
     @WithAnonymousUser
     void authenticateTest() throws Exception {
+        UserLoginDto user = UserLoginDto.builder()
+                .username("username")
+                .password("password")
+                .build();
+
         doReturn("Json.Web.Token").when(authService).authenticate(any(UserLoginDto.class));
 
         mockMvc
                 .perform(
                         post("/auth")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(new UserLoginDto()))
+                                .content(mapper.writeValueAsString(user))
 
                 )
                 .andExpect(status().isOk());
