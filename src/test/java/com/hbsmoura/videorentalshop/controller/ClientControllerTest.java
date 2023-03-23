@@ -178,6 +178,8 @@ class ClientControllerTest {
                                 .content(
                                         mapper.writeValueAsString(
                                                 ChangePasswordDto.builder()
+                                                        .newPassword("newPass")
+                                                        .currentPassword("oldPass")
                                                         .build()
                                         )
                                 )
