@@ -1,5 +1,6 @@
 package com.hbsmoura.videorentalshop.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,6 +14,7 @@ import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.model.Employee;
 import com.hbsmoura.videorentalshop.model.Movie;
 import com.hbsmoura.videorentalshop.service.BookingService;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -115,13 +118,20 @@ public class BookingControllerTest {
     @DisplayName("Create booking test")
     @WithMockUser(roles = "CLIENT")
     void createBookingTest() throws Exception {
+
+        String body = "{\"movie\": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"renter\"" + ": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"estimatedDevolution\": \"" +
+                LocalDate.now().plusDays(2).format(DateTimeFormatter.ISO_DATE) +
+                "\" }";
+
         doReturn(mockedBookingDto).when(bookingService).createBooking(any(BookingDto.class));
 
         mockMvc
                 .perform(
                         post("/bookings")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
+                                .content(body)
 
                 )
                 .andExpect(status().isCreated());
@@ -178,13 +188,19 @@ public class BookingControllerTest {
     @DisplayName("Update booking test")
     @WithMockUser(roles = "MANAGER")
     void updateBookingTest() throws Exception {
+        String body = "{\"movie\": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"renter\"" + ": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"estimatedDevolution\": \"" +
+                LocalDate.now().plusDays(2).format(DateTimeFormatter.ISO_DATE) +
+                "\" }";
+
         doReturn(mockedBookingDto).when(bookingService).updateBooking(any(BookingDto.class));
 
         mockMvc
                 .perform(
                         put("/bookings")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
+                                .content(body)
                 )
                 .andExpect(status().isOk());
     }
@@ -223,11 +239,17 @@ public class BookingControllerTest {
     void startRentTest() throws Exception {
         doReturn(mockedBookingDto).when(bookingService).startRent(any(BookingDto.class));
 
+        String string = "{\"movie\": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"renter\"" + ": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"estimatedDevolution\": \"" +
+                LocalDate.now().plusDays(2).format(DateTimeFormatter.ISO_DATE) +
+                "\" }";
+
         mockMvc
                 .perform(
                         patch("/bookings/start")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
+                                .content(string)
                 )
                 .andExpect(status().isOk());
     }
@@ -247,6 +269,12 @@ public class BookingControllerTest {
                 .regularPrice(mockedBooking.getRegularPrice())
                 .build();
 
+        String body = "{\"movie\": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"renter\"" + ": {\"id\": \"" + mockedBooking.getId() + "\"}," +
+                "\"estimatedDevolution\": \"" +
+                LocalDate.now().plusDays(2).format(DateTimeFormatter.ISO_DATE) +
+                "\" }";
+
         ObjectNode objectNode = mapper.readTree(mapper.writeValueAsString(newBookingDto)).deepCopy();
         String jsonObject = objectNode.without("links").toString();
 
@@ -256,7 +284,7 @@ public class BookingControllerTest {
                 .perform(
                         patch("/bookings/finalize")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(BookingDto.builder().build()))
+                                .content(body)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonObject));

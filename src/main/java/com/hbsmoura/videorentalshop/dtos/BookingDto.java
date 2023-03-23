@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -19,7 +20,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookingDto extends RepresentationModel<BookingDto> {
+public class BookingDto extends RepresentationModel<BookingDto> implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private UUID id;
 

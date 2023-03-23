@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +19,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MovieDto extends RepresentationModel<MovieDto> {
+public class MovieDto extends RepresentationModel<MovieDto> implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private UUID id;
 
