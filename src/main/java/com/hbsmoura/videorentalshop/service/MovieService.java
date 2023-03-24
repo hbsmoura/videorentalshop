@@ -1,11 +1,13 @@
 package com.hbsmoura.videorentalshop.service;
 
+import com.hbsmoura.videorentalshop.controller.MovieController;
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
 import com.hbsmoura.videorentalshop.exceptions.MovieNotFoundException;
 import com.hbsmoura.videorentalshop.exceptions.NoSuchGenreException;
 import com.hbsmoura.videorentalshop.model.Movie;
 import com.hbsmoura.videorentalshop.repository.MovieRepository;
+import com.hbsmoura.videorentalshop.utils.LinkReferrer;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,7 +50,9 @@ public class MovieService {
 
     public Page<MovieDto> listMovies(Pageable pageable) {
         Page<Movie> movies = movieRepository.findAll(pageable);
-        return movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
+        Page<MovieDto> moviesDto = movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
+
+        return moviesDto.map(m -> LinkReferrer.doRefer(m, MovieDto.class, MovieController.class, m.getId()));
     }
 
     /**
@@ -60,7 +64,8 @@ public class MovieService {
 
     public MovieDto getMovieById(UUID id) {
         Movie movie =  movieRepository.findById(id).orElseThrow(MovieNotFoundException::new);
-        return new ModelMapper().map(movie, MovieDto.class);
+        MovieDto movieDto = new ModelMapper().map(movie, MovieDto.class);
+        return LinkReferrer.doRefer(movieDto, MovieDto.class, MovieController.class, movieDto.getId());
     }
 
     /**
