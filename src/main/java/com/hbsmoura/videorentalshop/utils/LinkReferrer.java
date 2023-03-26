@@ -12,21 +12,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 public class LinkReferrer {
 
-    public static <T extends RepresentationModel> T doRefer(RepresentationModel obj, Class<T> objType, Class controller, UUID objectId) {
+    private LinkReferrer() {}
+
+    public static <T extends RepresentationModel<? extends T>> T doRefer(T obj, UUID objectId, Class<?> controller, Method ...chosenMethods) {
         obj.removeLinks();
-        Method[] controllerMethods = controller.getDeclaredMethods();
-        for (Method method : controllerMethods) {
+
+        if (chosenMethods.length == 0) chosenMethods = controller.getDeclaredMethods();
+
+        for (Method method : chosenMethods) {
+            if (method == null) continue;
             Annotation[] annotations = method.getDeclaredAnnotations();
             for (Annotation a : annotations) {
-                RequestMethod requestMethod = null;
-                if (a instanceof RequestMapping)
-                    requestMethod = method.getAnnotation(RequestMapping.class).method()[0];
-
-                if (a instanceof GetMapping || a instanceof PostMapping || a instanceof PutMapping ||
-                        a instanceof DeleteMapping ||a instanceof PatchMapping
-                )
-                    requestMethod = a.annotationType().getAnnotation(RequestMapping.class).method()[0];
-
+                RequestMethod requestMethod = verifyRequestMappingAnnotation(method, a);
                 if (requestMethod != null) {
                     if (Arrays.stream(method.getParameters()).anyMatch(p -> p.getName().equals("id"))) {
                         obj.add(linkTo(controller, method, objectId)
@@ -42,7 +39,26 @@ public class LinkReferrer {
             }
         }
 
-        return objType.cast(obj);
+        return obj;
+    }
+
+    public static Method extractMethod(Class<?> clazz, String name, Class<?> parametersType) {
+        try {
+            return clazz.getDeclaredMethod(name, parametersType);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    private static RequestMethod verifyRequestMappingAnnotation(Method method, Annotation annotation) {
+        if (annotation instanceof RequestMapping)
+            return method.getAnnotation(RequestMapping.class).method()[0];
+
+        if (annotation instanceof GetMapping || annotation instanceof PostMapping || annotation instanceof PutMapping ||
+                annotation instanceof DeleteMapping ||annotation instanceof PatchMapping
+        )
+            return annotation.annotationType().getAnnotation(RequestMapping.class).method()[0];
+        return null;
     }
 
     private static String camelCaseToSentenceCase(String text) {

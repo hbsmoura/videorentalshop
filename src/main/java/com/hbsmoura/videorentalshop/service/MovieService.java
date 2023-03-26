@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 @Service
@@ -48,11 +49,18 @@ public class MovieService {
      * @return a page of movies from the model layer
      */
 
-    public Page<MovieDto> listMovies(Pageable pageable) {
+    public Page<MovieDto> listMovies(Pageable pageable)  {
         Page<Movie> movies = movieRepository.findAll(pageable);
         Page<MovieDto> moviesDto = movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
 
-        return moviesDto.map(m -> LinkReferrer.doRefer(m, MovieDto.class, MovieController.class, m.getId()));
+        Method method = LinkReferrer.extractMethod(MovieController.class, "getMovieById", UUID.class);
+
+        return moviesDto.map(m ->
+                LinkReferrer.doRefer(
+                        m, m.getId(),
+                        MovieController.class, method
+                )
+        );
     }
 
     /**
@@ -65,7 +73,7 @@ public class MovieService {
     public MovieDto getMovieById(UUID id) {
         Movie movie =  movieRepository.findById(id).orElseThrow(MovieNotFoundException::new);
         MovieDto movieDto = new ModelMapper().map(movie, MovieDto.class);
-        return LinkReferrer.doRefer(movieDto, MovieDto.class, MovieController.class, movieDto.getId());
+        return LinkReferrer.doRefer(movieDto, movieDto.getId(), MovieController.class);
     }
 
     /**
