@@ -50,7 +50,7 @@ public class ClientController {
 
     @PutMapping
     @PreAuthorize("hasRole('CLIENT') and @authService.isItself(#givenClient.getId)")
-    public ClientLoginDto updateClient(@RequestBody @Valid ClientLoginDto givenClient) {
+    public ClientDto updateClient(@RequestBody @Valid ClientLoginDto givenClient) {
         return clientService.updateClient(givenClient);
     }
 

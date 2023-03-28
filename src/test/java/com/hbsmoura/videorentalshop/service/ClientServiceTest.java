@@ -135,7 +135,7 @@ class ClientServiceTest {
         doReturn(Optional.of(mockedClient)).when(clientRepository).findById(any(UUID.class));
         doReturn(mockedClient).when(clientRepository).save(any(Client.class));
 
-        ClientLoginDto returnedClient = clientService.updateClient(mockedClientLoginDto);
+        ClientDto returnedClient = clientService.updateClient(mockedClientLoginDto);
 
         assertThat(returnedClient.getId(), is(mockedClient.getId()));
         assertThat(returnedClient.getName(), is(mockedClient.getName()));

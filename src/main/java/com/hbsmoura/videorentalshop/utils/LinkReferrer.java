@@ -25,7 +25,10 @@ public class LinkReferrer {
             for (Annotation a : annotations) {
                 RequestMethod requestMethod = verifyRequestMappingAnnotation(method, a);
                 if (requestMethod != null) {
-                    if (Arrays.stream(method.getParameters()).anyMatch(p -> p.getName().equals("id"))) {
+                    boolean hasIdAsUniqueParameter = Arrays.stream(
+                            method.getParameters()).anyMatch(p -> p.getName().equals("id")
+                    ) && method.getParameters().length == 1;
+                    if (hasIdAsUniqueParameter) {
                         obj.add(linkTo(controller, method, objectId)
                                 .withRel(camelCaseToSentenceCase(method.getName()))
                                 .withType(requestMethod.name()));
