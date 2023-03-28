@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClientLoginDto implements Serializable {
+public class ClientLoginDto extends RepresentationModel<ClientLoginDto> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID id;

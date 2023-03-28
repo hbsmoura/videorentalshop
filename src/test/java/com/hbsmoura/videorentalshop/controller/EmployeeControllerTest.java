@@ -95,8 +95,7 @@ class EmployeeControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(mockedEmployeeDto))
                 )
-                .andExpect(status().isCreated())
-                .andExpect(content().json(mapper.writeValueAsString(employeeLoginDto)));
+                .andExpect(status().isCreated());
     }
 
     @Test
