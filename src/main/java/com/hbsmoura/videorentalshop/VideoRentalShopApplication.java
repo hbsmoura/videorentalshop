@@ -10,7 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		info=@Info(
 				title="Video Rental Shop API",
 				description = "API for managing a video rental shop, with access control for clients " +
-						"and employees, with hierarchy levels for employees (regular and manager)."
+						"and employees, with hierarchy levels for employees (regular and manager).",
+				version = "1.0"
 		)
 )
 public class VideoRentalShopApplication {

@@ -2,6 +2,7 @@ package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.service.BookingService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/bookings")
 @PreAuthorize("hasRole('EMPLOYEE')")
+@Tag(name = "Booking Controller")
 public class BookingController {
 
     private final BookingService bookingService;

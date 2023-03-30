@@ -4,6 +4,7 @@ import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
 import com.hbsmoura.videorentalshop.service.ClientService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/clients")
 @PreAuthorize("hasRole('EMPLOYEE')")
+@Tag(name = "Client Controller")
 public class ClientController {
 
     private final ClientService clientService;

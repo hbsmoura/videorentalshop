@@ -2,6 +2,7 @@ package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.service.MovieService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/movies")
 @PreAuthorize("permitAll()")
+@Tag(name = "Movie Controller")
 public class MovieController {
 
     private final MovieService movieService;
