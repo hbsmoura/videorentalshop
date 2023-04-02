@@ -62,7 +62,7 @@ public class MovieController {
 
     @GetMapping("/{id}")
     @Operation(
-            summary = "Get Movie By Id",
+            summary = "Get movie by id",
             description = "Retrieves a movie by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = MovieDto.class)))

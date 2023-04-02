@@ -1,7 +1,12 @@
 package com.hbsmoura.videorentalshop.controller;
 
+import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
+import com.hbsmoura.videorentalshop.config.exceptionhandling.ApiErrorResponse;
 import com.hbsmoura.videorentalshop.dtos.UserLoginDto;
 import com.hbsmoura.videorentalshop.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +28,11 @@ public class AuthController {
 
     @PostMapping
     @PreAuthorize("isAnonymous()")
+    @Operation(
+            summary = "Authenticate user",
+            description = "Authenticates an user and retrieves an access token"
+    )
+    @ApiResponseUnauthorized(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     public String authenticate(@RequestBody @Valid UserLoginDto login) {
         return authService.authenticate(login);
     }
