@@ -66,6 +66,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
             AuthenticationException.class,
             FailedLoginException.class,
             InvalidTokenException.class,
+            MovieNotAvailableException.class,
             PasswordNotMachException.class
     })
     public ResponseEntity<Object> handleUnauthorizedRequest(Exception ex, WebRequest request) {

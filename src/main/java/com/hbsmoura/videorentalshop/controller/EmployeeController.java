@@ -57,7 +57,7 @@ public class EmployeeController {
     @GetMapping("/{id}")
     @Operation(
             summary = "Get employee by id",
-            description = "Retrieves a employee by its id"
+            description = "Retrieves an employee by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = EmployeeDto.class)))
     @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
@@ -113,8 +113,8 @@ public class EmployeeController {
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Employee with given Id successfully deleted")
     @Operation(
-            summary = "Delete client",
-            description = "Deletes a employee's from database"
+            summary = "Delete employee",
+            description = "Deletes the employee from database"
     )
     @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     public void deleteEmployee(@PathVariable UUID id) {
