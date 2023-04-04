@@ -2,7 +2,6 @@ package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
-import com.hbsmoura.videorentalshop.config.exceptionhandling.ApiErrorResponse;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
@@ -60,7 +59,7 @@ public class ClientController {
             description = "Retrieves a client by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = ClientDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public ClientDto getClientById(@PathVariable UUID id) {
         return clientService.getClientById(id);
     }
@@ -81,7 +80,7 @@ public class ClientController {
             description = "Updates the client data"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = ClientDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public ClientDto updateClient(@RequestBody @Valid ClientLoginDto givenClient) {
         return clientService.updateClient(givenClient);
     }
@@ -93,7 +92,7 @@ public class ClientController {
             summary = "Change password",
             description = "Updates the clients password"
     )
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public void changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDto changePasswordDto) {
         clientService.changePassword(id, changePasswordDto);
     }
@@ -105,7 +104,7 @@ public class ClientController {
             summary = "Delete client",
             description = "Deletes a client from database"
     )
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public void deleteClient(@PathVariable UUID id) {
         clientService.deleteClientById(id);
     }

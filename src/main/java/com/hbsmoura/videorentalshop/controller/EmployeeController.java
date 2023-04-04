@@ -3,7 +3,6 @@ package com.hbsmoura.videorentalshop.controller;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
-import com.hbsmoura.videorentalshop.config.exceptionhandling.ApiErrorResponse;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
@@ -60,7 +59,7 @@ public class EmployeeController {
             description = "Retrieves an employee by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = EmployeeDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public EmployeeDto getEmployeeById(@PathVariable UUID id) {
         return employeeService.getEmployeeById(id);
     }
@@ -81,7 +80,7 @@ public class EmployeeController {
             description = "Updates the employee data"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = EmployeeDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public EmployeeDto updateEmployee(@RequestBody @Valid EmployeeLoginDto givenEmployee) {
         return employeeService.updateEmployee(givenEmployee);
     }
@@ -92,7 +91,7 @@ public class EmployeeController {
             description = "Set the management on the employee with the given id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = EmployeeDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public EmployeeDto setManagement(@PathVariable UUID id, @PathVariable("set") boolean set) {
         return employeeService.setManagement(id, set);
     }
@@ -104,8 +103,8 @@ public class EmployeeController {
             summary = "Change password",
             description = "Updates the employee's password"
     )
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-    @ApiResponseUnauthorized(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
+    @ApiResponseUnauthorized
     public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
         employeeService.changePassword(id, changePasswordDto);
     }
@@ -116,7 +115,7 @@ public class EmployeeController {
             summary = "Delete employee",
             description = "Deletes the employee from database"
     )
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public void deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployeeById(id);
     }

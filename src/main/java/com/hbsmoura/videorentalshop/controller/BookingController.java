@@ -3,7 +3,6 @@ package com.hbsmoura.videorentalshop.controller;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseBadRequest;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
-import com.hbsmoura.videorentalshop.config.exceptionhandling.ApiErrorResponse;
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,8 +29,8 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    private class PageofBookingDto extends PageImpl<BookingDto> {
-        public PageofBookingDto(List<BookingDto> content) {
+    private class PageOfBookingDto extends PageImpl<BookingDto> {
+        public PageOfBookingDto(List<BookingDto> content) {
             super(content);
         }
     }
@@ -48,7 +47,7 @@ public class BookingController {
             summary = "Create booking",
             description = "Creates a new booking, saves on database and retrieves it"
     )
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public BookingDto createBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.createBooking(givenBooking);
     }
@@ -68,7 +67,7 @@ public class BookingController {
             description = "Retrieves a booking by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public BookingDto getBookingById(@PathVariable UUID id) {
         return bookingService.getBookingById(id);
     }
@@ -78,8 +77,8 @@ public class BookingController {
             summary = "Search bookings by state",
             description = "Retrieves a list of bookings according to the given state parameter"
     )
-    @ApiResponseOk(content = @Content(schema = @Schema(implementation = PageofBookingDto.class)))
-    @ApiResponseBadRequest(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseOk(content = @Content(schema = @Schema(implementation = PageOfBookingDto.class)))
+    @ApiResponseBadRequest
     public Page<BookingDto> searchBookingsByState(@PathVariable String state, Pageable pageable) {
         return bookingService.searchBookingsByState(state, pageable);
     }
@@ -91,7 +90,7 @@ public class BookingController {
             description = "Updates the booking data"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public BookingDto updateBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.updateBooking(givenBooking);
     }
@@ -103,8 +102,8 @@ public class BookingController {
             description = "Cancels the booking"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-    @ApiResponseBadRequest(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
+    @ApiResponseBadRequest
     public BookingDto cancelBookingById(@PathVariable UUID id) {
         return bookingService.cancelBookingById(id);
     }
@@ -115,8 +114,8 @@ public class BookingController {
             description = "Starts the rent of a movie"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-    @ApiResponseBadRequest(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
+    @ApiResponseBadRequest
     public BookingDto startRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.startRent(givenBooking);
     }
@@ -127,8 +126,8 @@ public class BookingController {
             description = "Starts the rent of a movie"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-    @ApiResponseBadRequest(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
+    @ApiResponseBadRequest
     public BookingDto finalizeRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.finalizeRent(givenBooking);
     }
@@ -140,7 +139,7 @@ public class BookingController {
             summary = "Delete booking",
             description = "Deletes the booking from database"
     )
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public void deleteBookingById(@PathVariable UUID id) {
         bookingService.deleteBookingById(id);
     }
