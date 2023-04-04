@@ -2,7 +2,6 @@ package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
-import com.hbsmoura.videorentalshop.config.exceptionhandling.ApiErrorResponse;
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,7 +65,7 @@ public class MovieController {
             description = "Retrieves a movie by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = MovieDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public MovieDto getMovieById(@PathVariable UUID id) {
         return movieService.getMovieById(id);
     }
@@ -86,7 +85,7 @@ public class MovieController {
             description = "Retrieves a list of movies according to the given genre"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = PageOfMovieDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public Page<MovieDto> searchMoviesByGenre(@PathVariable String genre, Pageable pageable) {
         return movieService.searchMoviesByGenre(genre, pageable);
     }
@@ -107,7 +106,7 @@ public class MovieController {
             description = "Updates the movie data"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = MovieDto.class)))
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     public MovieDto updateMovie(@RequestBody @Valid MovieDto givenMovie) {
         return movieService.updateMovie(givenMovie);
     }
@@ -118,7 +117,7 @@ public class MovieController {
             summary = "Delete movie",
             description = "Deletes a movie from database"
     )
-    @ApiResponseNotFound(content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    @ApiResponseNotFound
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Movie with given Id successfully deleted")
     public void deleteMovie(@PathVariable UUID id) {
         movieService.deleteMovieById(id);
