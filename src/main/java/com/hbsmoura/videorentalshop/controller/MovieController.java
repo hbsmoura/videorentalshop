@@ -1,7 +1,9 @@
 package com.hbsmoura.videorentalshop.controller;
 
+import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseForbidden;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
+import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +48,8 @@ public class MovieController {
             summary = "Create movie",
             description = "Creates a new movie, saves on database and retrieves it"
     )
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public MovieDto createMovie(@RequestBody @Valid MovieDto givenMovie) {
         return movieService.createMovie(givenMovie);
     }
@@ -107,6 +111,8 @@ public class MovieController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = MovieDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public MovieDto updateMovie(@RequestBody @Valid MovieDto givenMovie) {
         return movieService.updateMovie(givenMovie);
     }
@@ -117,8 +123,10 @@ public class MovieController {
             summary = "Delete movie",
             description = "Deletes a movie from database"
     )
-    @ApiResponseNotFound
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Movie with given Id successfully deleted")
+    @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public void deleteMovie(@PathVariable UUID id) {
         movieService.deleteMovieById(id);
     }

@@ -1,7 +1,9 @@
 package com.hbsmoura.videorentalshop.controller;
 
+import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseForbidden;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
+import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
@@ -40,6 +42,7 @@ public class ClientController {
             summary = "Create client",
             description = "Creates a new client, saves on database and retrieves it"
     )
+    @ApiResponseForbidden
     public ClientLoginDto createClient(@RequestBody @Valid ClientDto givenClient) {
         return clientService.createClient(givenClient);
     }
@@ -49,6 +52,8 @@ public class ClientController {
             summary = "List clients",
             description = "Retrieves a paged list of clients"
     )
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public Page<ClientDto> listClients(Pageable pageable) {
         return clientService.listClients(pageable);
     }
@@ -60,6 +65,8 @@ public class ClientController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = ClientDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public ClientDto getClientById(@PathVariable UUID id) {
         return clientService.getClientById(id);
     }
@@ -69,6 +76,8 @@ public class ClientController {
             summary = "Search clients by name or username",
             description = "Retrieves a list of clients according to the given parameter text"
     )
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public Page<ClientDto> searchClientsByNameOrUsername(@PathVariable("text") String text, Pageable pageable) {
         return clientService.searchClientsByNameOrUsername(text, pageable);
     }
@@ -81,6 +90,8 @@ public class ClientController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = ClientDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public ClientDto updateClient(@RequestBody @Valid ClientLoginDto givenClient) {
         return clientService.updateClient(givenClient);
     }
@@ -93,6 +104,8 @@ public class ClientController {
             description = "Updates the clients password"
     )
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public void changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDto changePasswordDto) {
         clientService.changePassword(id, changePasswordDto);
     }
@@ -105,6 +118,8 @@ public class ClientController {
             description = "Deletes a client from database"
     )
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public void deleteClient(@PathVariable UUID id) {
         clientService.deleteClientById(id);
     }

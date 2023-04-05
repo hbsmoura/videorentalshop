@@ -1,5 +1,6 @@
 package com.hbsmoura.videorentalshop.controller;
 
+import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseForbidden;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
 import com.hbsmoura.videorentalshop.dtos.UserLoginDto;
 import com.hbsmoura.videorentalshop.service.AuthService;
@@ -30,6 +31,7 @@ public class AuthController {
             description = "Authenticates an user and retrieves an access token"
     )
     @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public String authenticate(@RequestBody @Valid UserLoginDto login) {
         return authService.authenticate(login);
     }

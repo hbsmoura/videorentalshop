@@ -1,8 +1,6 @@
 package com.hbsmoura.videorentalshop.controller;
 
-import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseBadRequest;
-import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
-import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
+import com.hbsmoura.videorentalshop.config.apiresponse.*;
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +46,8 @@ public class BookingController {
             description = "Creates a new booking, saves on database and retrieves it"
     )
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public BookingDto createBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.createBooking(givenBooking);
     }
@@ -57,6 +57,8 @@ public class BookingController {
             summary = "List bookings",
             description = "Retrieves a paged list of bookings"
     )
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public Page<BookingDto> listBookings(Pageable pageable) {
         return bookingService.listBookings(pageable);
     }
@@ -68,6 +70,8 @@ public class BookingController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public BookingDto getBookingById(@PathVariable UUID id) {
         return bookingService.getBookingById(id);
     }
@@ -79,6 +83,8 @@ public class BookingController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = PageOfBookingDto.class)))
     @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public Page<BookingDto> searchBookingsByState(@PathVariable String state, Pageable pageable) {
         return bookingService.searchBookingsByState(state, pageable);
     }
@@ -91,6 +97,8 @@ public class BookingController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public BookingDto updateBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.updateBooking(givenBooking);
     }
@@ -104,6 +112,8 @@ public class BookingController {
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
     @ApiResponseNotFound
     @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public BookingDto cancelBookingById(@PathVariable UUID id) {
         return bookingService.cancelBookingById(id);
     }
@@ -116,6 +126,8 @@ public class BookingController {
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
     @ApiResponseNotFound
     @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public BookingDto startRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.startRent(givenBooking);
     }
@@ -128,6 +140,8 @@ public class BookingController {
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
     @ApiResponseNotFound
     @ApiResponseBadRequest
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public BookingDto finalizeRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.finalizeRent(givenBooking);
     }
@@ -140,6 +154,8 @@ public class BookingController {
             description = "Deletes the booking from database"
     )
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public void deleteBookingById(@PathVariable UUID id) {
         bookingService.deleteBookingById(id);
     }
