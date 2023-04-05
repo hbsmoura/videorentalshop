@@ -1,5 +1,6 @@
 package com.hbsmoura.videorentalshop.controller;
 
+import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseForbidden;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
@@ -40,6 +41,8 @@ public class EmployeeController {
             summary = "Create employee",
             description = "Creates a new employee, saves on database and retrieves it"
     )
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public EmployeeLoginDto createEmployee(@RequestBody @Valid EmployeeDto givenEmployee) {
         return employeeService.createEmployee(givenEmployee);
     }
@@ -49,6 +52,8 @@ public class EmployeeController {
             summary = "List employees",
             description = "Retrieves a paged list of employees"
     )
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public Page<EmployeeDto> listEmployees(Pageable pageable) {
         return employeeService.listEmployees(pageable);
     }
@@ -60,6 +65,8 @@ public class EmployeeController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = EmployeeDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public EmployeeDto getEmployeeById(@PathVariable UUID id) {
         return employeeService.getEmployeeById(id);
     }
@@ -69,6 +76,8 @@ public class EmployeeController {
             summary = "Search employees by name or username",
             description = "Retrieves a list of employees according to the given parameter text"
     )
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public Page<EmployeeDto> searchEmployeesByNameOrUsername(@PathVariable("text") String text, Pageable pageable) {
         return employeeService.searchEmployeesByNameOrUsername(text, pageable);
     }
@@ -81,6 +90,8 @@ public class EmployeeController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = EmployeeDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public EmployeeDto updateEmployee(@RequestBody @Valid EmployeeLoginDto givenEmployee) {
         return employeeService.updateEmployee(givenEmployee);
     }
@@ -92,6 +103,8 @@ public class EmployeeController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = EmployeeDto.class)))
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public EmployeeDto setManagement(@PathVariable UUID id, @PathVariable("set") boolean set) {
         return employeeService.setManagement(id, set);
     }
@@ -105,6 +118,7 @@ public class EmployeeController {
     )
     @ApiResponseNotFound
     @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
         employeeService.changePassword(id, changePasswordDto);
     }
@@ -116,6 +130,8 @@ public class EmployeeController {
             description = "Deletes the employee from database"
     )
     @ApiResponseNotFound
+    @ApiResponseUnauthorized
+    @ApiResponseForbidden
     public void deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployeeById(id);
     }
