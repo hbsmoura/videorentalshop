@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/clients")
-@PreAuthorize("hasRole('EMPLOYEE')")
+@Secured({"ROLE_EMPLOYEE"})
 @Tag(name = "Client Controller")
 public class ClientController {
 
@@ -37,7 +38,7 @@ public class ClientController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("isAnonymous()")
+    @Secured({"ROLE_ANONYMOUS"})
     @Operation(
             summary = "Create client",
             description = "Creates a new client, saves on database and retrieves it"
@@ -112,7 +113,7 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Client with given Id successfully deleted")
-    @PreAuthorize("hasRole('MANAGER')")
+    @Secured({"ROLE_MANAGER"})
     @Operation(
             summary = "Delete client",
             description = "Deletes a client from database"

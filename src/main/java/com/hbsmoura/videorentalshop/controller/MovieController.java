@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +44,7 @@ public class MovieController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @Secured({"ROLE_EMPLOYEE"})
     @Operation(
             summary = "Create movie",
             description = "Creates a new movie, saves on database and retrieves it"
@@ -104,7 +105,7 @@ public class MovieController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @Secured({"ROLE_EMPLOYEE"})
     @Operation(
             summary = "Update movie",
             description = "Updates the movie data"
@@ -118,7 +119,7 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @Secured({"ROLE_MANAGER"})
     @Operation(
             summary = "Delete movie",
             description = "Deletes a movie from database"

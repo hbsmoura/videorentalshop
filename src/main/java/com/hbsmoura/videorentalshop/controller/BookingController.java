@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/bookings")
-@PreAuthorize("hasRole('EMPLOYEE')")
+@Secured({"ROLE_EMPLOYEE"})
 @Tag(name = "Booking Controller")
 public class BookingController {
 
@@ -40,7 +40,7 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('CLIENT')")
+    @Secured({"ROLE_CLIENT"})
     @Operation(
             summary = "Create booking",
             description = "Creates a new booking, saves on database and retrieves it"
@@ -90,7 +90,7 @@ public class BookingController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('MANAGER')")
+    @Secured({"ROLE_MANAGER"})
     @Operation(
             summary = "Update booking",
             description = "Updates the booking data"
@@ -104,7 +104,7 @@ public class BookingController {
     }
 
     @PatchMapping("/cancel/{id}")
-    @PreAuthorize("hasRole('CLIENT')")
+    @Secured({"ROLE_CLIENT"})
     @Operation(
             summary = "Cancel booking",
             description = "Cancels the booking"
@@ -147,7 +147,7 @@ public class BookingController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @Secured({"ROLE_MANAGER"})
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Booking with given Id successfully deleted")
     @Operation(
             summary = "Delete booking",
