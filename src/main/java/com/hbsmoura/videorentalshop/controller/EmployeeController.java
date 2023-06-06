@@ -117,7 +117,7 @@ public class EmployeeController {
     )
     @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
     @HateoasLink(relation = "Change password", requestType = "PATCH")
-    public void changePassword(@PathVariable UUID id, ChangePasswordDto changePasswordDto) {
+    public void changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDto changePasswordDto) {
         employeeService.changePassword(id, changePasswordDto);
     }
 
