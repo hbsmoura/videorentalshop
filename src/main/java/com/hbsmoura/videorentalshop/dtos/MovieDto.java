@@ -1,5 +1,8 @@
 package com.hbsmoura.videorentalshop.dtos;
 
+import com.hbsmoura.videorentalshop.config.hateoas.HateoasIdentity;
+import com.hbsmoura.videorentalshop.config.hateoas.HateoasModel;
+import com.hbsmoura.videorentalshop.controller.MovieController;
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
 import com.hbsmoura.videorentalshop.model.Movie;
 import jakarta.validation.constraints.NotBlank;
@@ -19,9 +22,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@HateoasModel(controller = MovieController.class)
 public class MovieDto extends RepresentationModel<MovieDto> implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @HateoasIdentity
     private UUID id;
 
     @NotBlank

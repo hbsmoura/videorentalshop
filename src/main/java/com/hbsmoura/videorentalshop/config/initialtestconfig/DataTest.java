@@ -149,7 +149,7 @@ public class DataTest {
                 BookingDto.builder()
                         .movie(new ModelMapper().map(movie1, Movie.class))
                         .renter(new ModelMapper().map(client1, Client.class))
-                        .estimatedDevolution(LocalDate.of(2022, 12, 22))
+                        .estimatedDevolution(LocalDate.of(2023, 6, 17))
                         .build()
         );
     }

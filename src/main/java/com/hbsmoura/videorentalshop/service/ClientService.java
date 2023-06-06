@@ -1,6 +1,6 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.controller.ClientController;
+import com.hbsmoura.videorentalshop.config.hateoas.LinkReferrer;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
@@ -8,7 +8,6 @@ import com.hbsmoura.videorentalshop.exceptions.ClientNotFoundException;
 import com.hbsmoura.videorentalshop.exceptions.PasswordNotMachException;
 import com.hbsmoura.videorentalshop.model.Client;
 import com.hbsmoura.videorentalshop.repository.ClientRepository;
-import com.hbsmoura.videorentalshop.utils.LinkReferrer;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -31,8 +29,6 @@ public class ClientService {
     private final ClientRepository clientRepository;
 
     private final PasswordEncoder passwordEncoder;
-
-    private static final String METHOD_NAME = "getClientById";
 
     @Autowired
     public ClientService(ClientRepository clientRepository, PasswordEncoder passwordEncoder) {
@@ -61,7 +57,7 @@ public class ClientService {
         ClientLoginDto clientToBeReturned = new ModelMapper().map(savedClient, ClientLoginDto.class);
         clientToBeReturned.setPassword(randomPass);
 
-        return LinkReferrer.doRefer(clientToBeReturned, clientToBeReturned.getId(), ClientController.class);
+        return LinkReferrer.doRefer(clientToBeReturned);
     }
 
     /**
@@ -74,9 +70,7 @@ public class ClientService {
         Page<Client> clients = clientRepository.findAll(pageable);
         Page<ClientDto> clientsDto = clients.map(client -> new ModelMapper().map(client, ClientDto.class));
 
-        Method method = LinkReferrer.extractMethod(ClientController.class, METHOD_NAME, UUID.class);
-
-        return clientsDto.map(m -> LinkReferrer.doRefer(m, m.getId(), ClientController.class, method));
+        return clientsDto.map(c -> LinkReferrer.doRefer(c));
     }
 
     /**
@@ -90,7 +84,7 @@ public class ClientService {
         Client client =  clientRepository.findById(id).orElseThrow(ClientNotFoundException::new);
         ClientDto clientDto = new ModelMapper().map(client, ClientDto.class);
 
-        return LinkReferrer.doRefer(clientDto, clientDto.getId(), ClientController.class);
+        return LinkReferrer.doRefer(clientDto);
     }
 
     /**
@@ -104,9 +98,7 @@ public class ClientService {
         Page<Client> clients = clientRepository.findByNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(text, text, pageable);
         Page<ClientDto> clientsDto = clients.map(client -> new ModelMapper().map(client, ClientDto.class));
 
-        Method method = LinkReferrer.extractMethod(ClientController.class, METHOD_NAME, UUID.class);
-
-        return clientsDto.map(m -> LinkReferrer.doRefer(m, m.getId(), ClientController.class, method));
+        return clientsDto.map(c -> LinkReferrer.doRefer(c));
     }
 
     /**
@@ -126,7 +118,7 @@ public class ClientService {
 
         ClientDto clientDto = new ModelMapper().map(client, ClientDto.class);
 
-        return LinkReferrer.doRefer(clientDto, clientDto.getId(), ClientController.class);
+        return LinkReferrer.doRefer(clientDto);
     }
 
     /**

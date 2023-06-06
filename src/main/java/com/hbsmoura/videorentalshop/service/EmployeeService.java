@@ -1,6 +1,6 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.controller.EmployeeController;
+import com.hbsmoura.videorentalshop.config.hateoas.LinkReferrer;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
@@ -8,7 +8,6 @@ import com.hbsmoura.videorentalshop.exceptions.EmployeeNotFoundException;
 import com.hbsmoura.videorentalshop.exceptions.PasswordNotMachException;
 import com.hbsmoura.videorentalshop.model.Employee;
 import com.hbsmoura.videorentalshop.repository.EmployeeRepository;
-import com.hbsmoura.videorentalshop.utils.LinkReferrer;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 @Service
@@ -26,8 +24,6 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
 
     private final PasswordEncoder passwordEncoder;
-
-    private static final String METHOD_NAME = "getEmployeeById";
 
     @Autowired
     public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
@@ -56,7 +52,7 @@ public class EmployeeService {
         EmployeeLoginDto employeeToBeReturned = new EmployeeLoginDto(savedEmployee);
         employeeToBeReturned.setPassword(randomPass);
 
-        return LinkReferrer.doRefer(employeeToBeReturned, employeeToBeReturned.getId(), EmployeeController.class);
+        return LinkReferrer.doRefer(employeeToBeReturned);
     }
 
     /**
@@ -69,9 +65,7 @@ public class EmployeeService {
         Page<Employee> employees = employeeRepository.findAll(pageable);
         Page<EmployeeDto> employeesDto = employees.map(employee -> new ModelMapper().map(employee, EmployeeDto.class));
 
-        Method method = LinkReferrer.extractMethod(EmployeeController.class, METHOD_NAME, UUID.class);
-
-        return employeesDto.map(m -> LinkReferrer.doRefer(m, m.getId(), EmployeeController.class, method));
+        return employeesDto.map(e -> LinkReferrer.doRefer(e));
     }
 
     /**
@@ -85,7 +79,7 @@ public class EmployeeService {
         Employee employee =  employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
         EmployeeDto employeeDto = new ModelMapper().map(employee, EmployeeDto.class);
 
-        return LinkReferrer.doRefer(employeeDto, employeeDto.getId(), EmployeeController.class);
+        return LinkReferrer.doRefer(employeeDto);
     }
 
     /**
@@ -99,9 +93,7 @@ public class EmployeeService {
         Page<Employee> employees = employeeRepository.findByNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(text, text, pageable);
         Page<EmployeeDto> employeesDto = employees.map(employee -> new ModelMapper().map(employee, EmployeeDto.class));
 
-        Method method = LinkReferrer.extractMethod(EmployeeController.class, METHOD_NAME, UUID.class);
-
-        return employeesDto.map(m -> LinkReferrer.doRefer(m, m.getId(), EmployeeController.class, method));
+        return employeesDto.map(e -> LinkReferrer.doRefer(e));
     }
 
     /**
@@ -121,7 +113,7 @@ public class EmployeeService {
 
         EmployeeDto employeeDto = new ModelMapper().map(employee, EmployeeDto.class);
 
-        return LinkReferrer.doRefer(employeeDto, employeeDto.getId(), EmployeeController.class);
+        return LinkReferrer.doRefer(employeeDto);
     }
 
     /**
@@ -141,7 +133,7 @@ public class EmployeeService {
 
         EmployeeDto employeeDto = new ModelMapper().map(employee, EmployeeDto.class);
 
-        return LinkReferrer.doRefer(employeeDto, employeeDto.getId(), EmployeeController.class);
+        return LinkReferrer.doRefer(employeeDto);
     }
 
     /**

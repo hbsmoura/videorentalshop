@@ -1,6 +1,6 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.controller.BookingController;
+import com.hbsmoura.videorentalshop.config.hateoas.LinkReferrer;
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.enums.EnumBookingState;
 import com.hbsmoura.videorentalshop.exceptions.*;
@@ -12,7 +12,6 @@ import com.hbsmoura.videorentalshop.repository.BookingRepository;
 import com.hbsmoura.videorentalshop.repository.ClientRepository;
 import com.hbsmoura.videorentalshop.repository.EmployeeRepository;
 import com.hbsmoura.videorentalshop.repository.MovieRepository;
-import com.hbsmoura.videorentalshop.utils.LinkReferrer;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
@@ -35,7 +33,6 @@ public class BookingService {
     private final MovieRepository movieRepository;
     private final ClientRepository clientRepository;
     private final EmployeeRepository employeeRepository;
-    private static final String METHOD_NAME = "getBookingById";
 
     @Autowired
     public BookingService(BookingRepository bookingRepository, MovieRepository movieRepository, ClientRepository clientRepository, EmployeeRepository employeeRepository) {
@@ -78,7 +75,7 @@ public class BookingService {
 
         BookingDto savedBookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
 
-        return LinkReferrer.doRefer(savedBookingDto, savedBookingDto.getId(), BookingController.class);
+        return LinkReferrer.doRefer(savedBookingDto);
     }
 
     /**
@@ -91,9 +88,7 @@ public class BookingService {
         Page<Booking> bookings = bookingRepository.findAll(pageable);
         Page<BookingDto> bookingsDto = bookings.map(booking -> new ModelMapper().map(booking, BookingDto.class));
 
-        Method method = LinkReferrer.extractMethod(BookingController.class, METHOD_NAME, UUID.class);
-
-        return bookingsDto.map(m -> LinkReferrer.doRefer(m, m.getId(), BookingController.class, method));
+        return bookingsDto.map(b -> LinkReferrer.doRefer(b));
     }
 
     /**
@@ -107,7 +102,7 @@ public class BookingService {
         Booking booking =  bookingRepository.findById(id).orElseThrow(BookingNotFoundException::new);
         BookingDto bookingDto = new ModelMapper().map(booking, BookingDto.class);
 
-        return LinkReferrer.doRefer(bookingDto, bookingDto.getId(), BookingController.class);
+        return LinkReferrer.doRefer(bookingDto);
     }
 
     /**
@@ -125,9 +120,7 @@ public class BookingService {
             Page<Booking> bookings = bookingRepository.findByState(state, pageable);
             Page<BookingDto> bookingsDto = bookings.map(booking -> new ModelMapper().map(booking, BookingDto.class));
 
-            Method method = LinkReferrer.extractMethod(BookingController.class, METHOD_NAME, UUID.class);
-
-            return bookingsDto.map(m -> LinkReferrer.doRefer(m, m.getId(), BookingController.class, method));
+            return bookingsDto.map(b -> LinkReferrer.doRefer(b));
         } catch (IllegalArgumentException e) {
             throw new NoSuchGenreException(givenState);
         }
@@ -163,7 +156,7 @@ public class BookingService {
         Booking savedBooking = bookingRepository.save(booking);
         BookingDto bookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
 
-        return LinkReferrer.doRefer(bookingDto, bookingDto.getId(), BookingController.class);
+        return LinkReferrer.doRefer(bookingDto);
     }
 
     /**
@@ -186,7 +179,7 @@ public class BookingService {
 
         BookingDto bookingDto = new ModelMapper().map(booking, BookingDto.class);
 
-        return LinkReferrer.doRefer(bookingDto, bookingDto.getId(), BookingController.class);
+        return LinkReferrer.doRefer(bookingDto);
     }
 
     /**
@@ -230,7 +223,7 @@ public class BookingService {
 
         BookingDto bookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
 
-        return LinkReferrer.doRefer(bookingDto, bookingDto.getId(), BookingController.class);
+        return LinkReferrer.doRefer(bookingDto);
     }
 
     /**
@@ -277,7 +270,7 @@ public class BookingService {
         Booking savedBooking = bookingRepository.save(booking);
         BookingDto bookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
 
-        return LinkReferrer.doRefer(bookingDto, bookingDto.getId(), BookingController.class);
+        return LinkReferrer.doRefer(bookingDto);
     }
 
     /**

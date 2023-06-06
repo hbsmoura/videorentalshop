@@ -1,6 +1,7 @@
 package com.hbsmoura.videorentalshop.controller;
 
 import com.hbsmoura.videorentalshop.config.apiresponse.*;
+import com.hbsmoura.videorentalshop.config.hateoas.HateoasLink;
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,9 +46,8 @@ public class BookingController {
             summary = "Create booking",
             description = "Creates a new booking, saves on database and retrieves it"
     )
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Create", requestType = "POST")
     public BookingDto createBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.createBooking(givenBooking);
     }
@@ -57,8 +57,8 @@ public class BookingController {
             summary = "List bookings",
             description = "Retrieves a paged list of bookings"
     )
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "List")
     public Page<BookingDto> listBookings(Pageable pageable) {
         return bookingService.listBookings(pageable);
     }
@@ -69,9 +69,8 @@ public class BookingController {
             description = "Retrieves a booking by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(selfRel = true)
     public BookingDto getBookingById(@PathVariable UUID id) {
         return bookingService.getBookingById(id);
     }
@@ -82,9 +81,8 @@ public class BookingController {
             description = "Retrieves a list of bookings according to the given state parameter"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = PageOfBookingDto.class)))
-    @ApiResponseBadRequest
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseBadRequest @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Search by state")
     public Page<BookingDto> searchBookingsByState(@PathVariable String state, Pageable pageable) {
         return bookingService.searchBookingsByState(state, pageable);
     }
@@ -96,9 +94,8 @@ public class BookingController {
             description = "Updates the booking data"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Update", requestType = "PUT")
     public BookingDto updateBooking(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.updateBooking(givenBooking);
     }
@@ -110,10 +107,8 @@ public class BookingController {
             description = "Cancels the booking"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseBadRequest
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseBadRequest @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Cancel", requestType = "PATCH")
     public BookingDto cancelBookingById(@PathVariable UUID id) {
         return bookingService.cancelBookingById(id);
     }
@@ -124,10 +119,8 @@ public class BookingController {
             description = "Starts the rent of a movie"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseBadRequest
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseBadRequest @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Start rent", requestType = "PATCH")
     public BookingDto startRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.startRent(givenBooking);
     }
@@ -138,10 +131,8 @@ public class BookingController {
             description = "Starts the rent of a movie"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = BookingDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseBadRequest
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseBadRequest @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Finalize rent", requestType = "PATCH")
     public BookingDto finalizeRent(@RequestBody @Valid BookingDto givenBooking) {
         return bookingService.finalizeRent(givenBooking);
     }
@@ -153,9 +144,8 @@ public class BookingController {
             summary = "Delete booking",
             description = "Deletes the booking from database"
     )
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Delete", requestType = "DELETE")
     public void deleteBookingById(@PathVariable UUID id) {
         bookingService.deleteBookingById(id);
     }
