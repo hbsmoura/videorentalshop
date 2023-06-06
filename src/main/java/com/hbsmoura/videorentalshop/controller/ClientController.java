@@ -4,6 +4,7 @@ import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseForbidden;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
+import com.hbsmoura.videorentalshop.config.hateoas.HateoasLink;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
@@ -44,6 +45,7 @@ public class ClientController {
             description = "Creates a new client, saves on database and retrieves it"
     )
     @ApiResponseForbidden
+    @HateoasLink(relation = "Create", requestType = "POST")
     public ClientLoginDto createClient(@RequestBody @Valid ClientDto givenClient) {
         return clientService.createClient(givenClient);
     }
@@ -53,8 +55,8 @@ public class ClientController {
             summary = "List clients",
             description = "Retrieves a paged list of clients"
     )
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "List")
     public Page<ClientDto> listClients(Pageable pageable) {
         return clientService.listClients(pageable);
     }
@@ -65,9 +67,8 @@ public class ClientController {
             description = "Retrieves a client by its id"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = ClientDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(selfRel = true)
     public ClientDto getClientById(@PathVariable UUID id) {
         return clientService.getClientById(id);
     }
@@ -77,8 +78,8 @@ public class ClientController {
             summary = "Search clients by name or username",
             description = "Retrieves a list of clients according to the given parameter text"
     )
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseUnauthorized@ApiResponseForbidden
+    @HateoasLink(relation = "Search by name or username")
     public Page<ClientDto> searchClientsByNameOrUsername(@PathVariable("text") String text, Pageable pageable) {
         return clientService.searchClientsByNameOrUsername(text, pageable);
     }
@@ -90,9 +91,8 @@ public class ClientController {
             description = "Updates the client data"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = ClientDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Update", requestType = "PUT")
     public ClientDto updateClient(@RequestBody @Valid ClientLoginDto givenClient) {
         return clientService.updateClient(givenClient);
     }
@@ -104,9 +104,8 @@ public class ClientController {
             summary = "Change password",
             description = "Updates the clients password"
     )
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Change password", requestType = "PATCH")
     public void changePassword(@PathVariable UUID id, @RequestBody @Valid ChangePasswordDto changePasswordDto) {
         clientService.changePassword(id, changePasswordDto);
     }
@@ -118,9 +117,8 @@ public class ClientController {
             summary = "Delete client",
             description = "Deletes a client from database"
     )
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Delete", requestType = "DELETE")
     public void deleteClient(@PathVariable UUID id) {
         clientService.deleteClientById(id);
     }

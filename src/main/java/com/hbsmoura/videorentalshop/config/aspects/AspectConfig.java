@@ -7,4 +7,4 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @Configuration
 @EnableAspectJAutoProxy
 @ComponentScan("com.hbsmoura.videorentalshop")
-public class AspectConfig { }
+public class AspectConfig {}

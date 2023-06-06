@@ -1,27 +1,22 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.controller.MovieController;
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.enums.EnumMovieGenre;
 import com.hbsmoura.videorentalshop.exceptions.MovieNotFoundException;
 import com.hbsmoura.videorentalshop.exceptions.NoSuchGenreException;
 import com.hbsmoura.videorentalshop.model.Movie;
 import com.hbsmoura.videorentalshop.repository.MovieRepository;
-import com.hbsmoura.videorentalshop.utils.LinkReferrer;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 @Service
 public class MovieService {
     private final MovieRepository movieRepository;
-
-    private static final String METHOD_NAME = "getMovieById";
 
     @Autowired
     public MovieService(MovieRepository movieRepository) {
@@ -42,9 +37,7 @@ public class MovieService {
 
         Movie savedMovie = movieRepository.save(newMovie);
 
-        MovieDto savedMovieDto = new ModelMapper().map(savedMovie, MovieDto.class);
-
-        return LinkReferrer.doRefer(savedMovieDto, savedMovieDto.getId(), MovieController.class);
+        return new ModelMapper().map(savedMovie, MovieDto.class);
     }
 
     /**
@@ -55,11 +48,7 @@ public class MovieService {
 
     public Page<MovieDto> listMovies(Pageable pageable)  {
         Page<Movie> movies = movieRepository.findAll(pageable);
-        Page<MovieDto> moviesDto = movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
-
-        Method method = LinkReferrer.extractMethod(MovieController.class, METHOD_NAME, UUID.class);
-
-        return moviesDto.map(m -> LinkReferrer.doRefer(m, m.getId(), MovieController.class, method));
+        return movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
     }
 
     /**
@@ -71,8 +60,7 @@ public class MovieService {
 
     public MovieDto getMovieById(UUID id) {
         Movie movie =  movieRepository.findById(id).orElseThrow(MovieNotFoundException::new);
-        MovieDto movieDto = new ModelMapper().map(movie, MovieDto.class);
-        return LinkReferrer.doRefer(movieDto, movieDto.getId(), MovieController.class);
+        return new ModelMapper().map(movie, MovieDto.class);
     }
 
     /**
@@ -87,11 +75,7 @@ public class MovieService {
                 .findByTitleContainingIgnoreCaseOrDirectionContainingIgnoreCaseOrInfoContainingIgnoreCase(
                         text, text, text, pageable
                 );
-        Page<MovieDto> moviesDto = movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
-
-        Method method = LinkReferrer.extractMethod(MovieController.class, METHOD_NAME, UUID.class);
-
-        return moviesDto.map(m -> LinkReferrer.doRefer(m, m.getId(), MovieController.class, method));
+        return movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
     }
 
     /**
@@ -107,11 +91,8 @@ public class MovieService {
         try {
             EnumMovieGenre genre = EnumMovieGenre.valueOf(givenGenre);
             Page<Movie> movies = movieRepository.findByGenres(genre, pageable);
-            Page<MovieDto> moviesDto = movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
 
-            Method method = LinkReferrer.extractMethod(MovieController.class, METHOD_NAME, UUID.class);
-
-            return moviesDto.map(m -> LinkReferrer.doRefer(m, m.getId(), MovieController.class, method));
+            return movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
         } catch (IllegalArgumentException e) {
             throw new NoSuchGenreException(givenGenre);
         }
@@ -126,11 +107,7 @@ public class MovieService {
 
     public Page<MovieDto> searchMoviesByTheme(String theme, Pageable pageable) {
         Page<Movie> movies = movieRepository.findByThemesIgnoreCase(theme, pageable);
-        Page<MovieDto> moviesDto = movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
-
-        Method method = LinkReferrer.extractMethod(MovieController.class, METHOD_NAME, UUID.class);
-
-        return moviesDto.map(m -> LinkReferrer.doRefer(m, m.getId(), MovieController.class, method));
+        return movies.map(movie -> new ModelMapper().map(movie, MovieDto.class));
     }
 
     /**
@@ -162,8 +139,7 @@ public class MovieService {
 
         movieRepository.save(movie);
 
-        MovieDto movieDto = new ModelMapper().map(movie, MovieDto.class);
-        return LinkReferrer.doRefer(movieDto, movieDto.getId(), MovieController.class);
+        return new ModelMapper().map(movie, MovieDto.class);
     }
 
     /**

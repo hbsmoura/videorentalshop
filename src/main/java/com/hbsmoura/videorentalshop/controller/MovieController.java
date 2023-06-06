@@ -4,6 +4,7 @@ import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseForbidden;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseNotFound;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseOk;
 import com.hbsmoura.videorentalshop.config.apiresponse.ApiResponseUnauthorized;
+import com.hbsmoura.videorentalshop.config.hateoas.HateoasLink;
 import com.hbsmoura.videorentalshop.dtos.MovieDto;
 import com.hbsmoura.videorentalshop.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,8 +50,8 @@ public class MovieController {
             summary = "Create movie",
             description = "Creates a new movie, saves on database and retrieves it"
     )
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Create", requestType = "POST")
     public MovieDto createMovie(@RequestBody @Valid MovieDto givenMovie) {
         return movieService.createMovie(givenMovie);
     }
@@ -60,6 +61,7 @@ public class MovieController {
             summary = "List movies",
             description = "Retrieves a paged list of movies"
     )
+    @HateoasLink(relation = "List")
     public Page<MovieDto> listMovies(Pageable pageable) {
         return movieService.listMovies(pageable);
     }
@@ -71,6 +73,7 @@ public class MovieController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = MovieDto.class)))
     @ApiResponseNotFound
+    @HateoasLink(selfRel = true)
     public MovieDto getMovieById(@PathVariable UUID id) {
         return movieService.getMovieById(id);
     }
@@ -80,6 +83,7 @@ public class MovieController {
             summary = "Search movies by title, direction, or info",
             description = "Retrieves a list of movies according to the given parameter text"
     )
+    @HateoasLink(relation = "Search by title, direction, or info")
     public Page<MovieDto> searchMoviesByTitleDirectionOrInfo(@PathVariable String text, Pageable pageable) {
         return movieService.searchMoviesByTitleOrDirectionOrInfo(text, pageable);
     }
@@ -91,6 +95,7 @@ public class MovieController {
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = PageOfMovieDto.class)))
     @ApiResponseNotFound
+    @HateoasLink(relation = "Search by genre")
     public Page<MovieDto> searchMoviesByGenre(@PathVariable String genre, Pageable pageable) {
         return movieService.searchMoviesByGenre(genre, pageable);
     }
@@ -100,6 +105,7 @@ public class MovieController {
             summary = "Search movies by theme",
             description = "Retrieves a list of movies according to the given theme"
     )
+    @HateoasLink(relation = "Search by theme")
     public Page<MovieDto> searchMoviesByTheme(@PathVariable String theme, Pageable pageable) {
         return movieService.searchMoviesByTheme(theme, pageable);
     }
@@ -111,9 +117,8 @@ public class MovieController {
             description = "Updates the movie data"
     )
     @ApiResponseOk(content = @Content(schema = @Schema(implementation = MovieDto.class)))
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Update", requestType = "PUT")
     public MovieDto updateMovie(@RequestBody @Valid MovieDto givenMovie) {
         return movieService.updateMovie(givenMovie);
     }
@@ -125,9 +130,8 @@ public class MovieController {
             description = "Deletes a movie from database"
     )
     @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Movie with given Id successfully deleted")
-    @ApiResponseNotFound
-    @ApiResponseUnauthorized
-    @ApiResponseForbidden
+    @ApiResponseNotFound @ApiResponseUnauthorized @ApiResponseForbidden
+    @HateoasLink(relation = "Delete", requestType = "DELETE")
     public void deleteMovie(@PathVariable UUID id) {
         movieService.deleteMovieById(id);
     }

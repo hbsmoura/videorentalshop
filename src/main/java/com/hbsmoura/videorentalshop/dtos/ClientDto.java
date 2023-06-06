@@ -1,5 +1,8 @@
 package com.hbsmoura.videorentalshop.dtos;
 
+import com.hbsmoura.videorentalshop.config.hateoas.HateoasIdentity;
+import com.hbsmoura.videorentalshop.config.hateoas.HateoasModel;
+import com.hbsmoura.videorentalshop.controller.ClientController;
 import com.hbsmoura.videorentalshop.model.Booking;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -16,9 +19,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@HateoasModel(controller = ClientController.class)
 public class ClientDto extends RepresentationModel<ClientDto> implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @HateoasIdentity
     private UUID id;
 
     @NotBlank
