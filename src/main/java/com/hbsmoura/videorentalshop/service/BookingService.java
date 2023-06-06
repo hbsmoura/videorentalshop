@@ -1,6 +1,5 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.config.hateoas.LinkReferrer;
 import com.hbsmoura.videorentalshop.dtos.BookingDto;
 import com.hbsmoura.videorentalshop.enums.EnumBookingState;
 import com.hbsmoura.videorentalshop.exceptions.*;
@@ -73,9 +72,7 @@ public class BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        BookingDto savedBookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
-
-        return LinkReferrer.doRefer(savedBookingDto);
+        return new ModelMapper().map(savedBooking, BookingDto.class);
     }
 
     /**
@@ -86,9 +83,7 @@ public class BookingService {
 
     public Page<BookingDto> listBookings(Pageable pageable) {
         Page<Booking> bookings = bookingRepository.findAll(pageable);
-        Page<BookingDto> bookingsDto = bookings.map(booking -> new ModelMapper().map(booking, BookingDto.class));
-
-        return bookingsDto.map(b -> LinkReferrer.doRefer(b));
+        return bookings.map(booking -> new ModelMapper().map(booking, BookingDto.class));
     }
 
     /**
@@ -100,9 +95,7 @@ public class BookingService {
 
     public BookingDto getBookingById(UUID id) {
         Booking booking =  bookingRepository.findById(id).orElseThrow(BookingNotFoundException::new);
-        BookingDto bookingDto = new ModelMapper().map(booking, BookingDto.class);
-
-        return LinkReferrer.doRefer(bookingDto);
+        return new ModelMapper().map(booking, BookingDto.class);
     }
 
     /**
@@ -118,9 +111,8 @@ public class BookingService {
         try {
             EnumBookingState state = EnumBookingState.valueOf(givenState);
             Page<Booking> bookings = bookingRepository.findByState(state, pageable);
-            Page<BookingDto> bookingsDto = bookings.map(booking -> new ModelMapper().map(booking, BookingDto.class));
 
-            return bookingsDto.map(b -> LinkReferrer.doRefer(b));
+            return bookings.map(booking -> new ModelMapper().map(booking, BookingDto.class));
         } catch (IllegalArgumentException e) {
             throw new NoSuchGenreException(givenState);
         }
@@ -154,9 +146,7 @@ public class BookingService {
         booking.setPenalty(booking.getPenalty());
 
         Booking savedBooking = bookingRepository.save(booking);
-        BookingDto bookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
-
-        return LinkReferrer.doRefer(bookingDto);
+        return new ModelMapper().map(savedBooking, BookingDto.class);
     }
 
     /**
@@ -177,9 +167,7 @@ public class BookingService {
         booking.setState(EnumBookingState.CANCELED);
         booking.setPenalty(new BigDecimal(0).subtract(booking.getRegularPrice()));
 
-        BookingDto bookingDto = new ModelMapper().map(booking, BookingDto.class);
-
-        return LinkReferrer.doRefer(bookingDto);
+        return new ModelMapper().map(booking, BookingDto.class);
     }
 
     /**
@@ -221,9 +209,7 @@ public class BookingService {
         movieRepository.save(movie);
         Booking savedBooking = bookingRepository.save(booking);
 
-        BookingDto bookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
-
-        return LinkReferrer.doRefer(bookingDto);
+        return new ModelMapper().map(savedBooking, BookingDto.class);
     }
 
     /**
@@ -268,9 +254,7 @@ public class BookingService {
 
         movieRepository.save(movie);
         Booking savedBooking = bookingRepository.save(booking);
-        BookingDto bookingDto = new ModelMapper().map(savedBooking, BookingDto.class);
-
-        return LinkReferrer.doRefer(bookingDto);
+        return new ModelMapper().map(savedBooking, BookingDto.class);
     }
 
     /**

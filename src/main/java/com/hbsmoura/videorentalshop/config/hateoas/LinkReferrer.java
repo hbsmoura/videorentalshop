@@ -7,6 +7,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ public class LinkReferrer {
 
     private LinkReferrer() {}
 
-    public static <T extends RepresentationModel<? extends T>> T doRefer(T obj) {
+    public static <T extends RepresentationModel<? extends T>> T doRefer(T obj, boolean idOnly) {
         HateoasModel hateoasModelAnnotation = obj.getClass().getAnnotation(HateoasModel.class);
 
         if (hateoasModelAnnotation == null) return obj;
@@ -32,16 +33,33 @@ public class LinkReferrer {
 
         identityField = idFieldOptional.get();
 
-        Object identity = null;
+        String identityFieldName = identityField.getName();
+
+        Object identity;
+
         try {
-            identityField.setAccessible(true);
-            identity = identityField.get(obj);
-        } catch (IllegalAccessException e) {
+            identity = obj.getClass()
+                    .getDeclaredMethod("get" +
+                            identityFieldName.substring(0, 1).toUpperCase() + identityFieldName.substring(1)
+                    ).invoke(obj);
+        } catch (Exception e) {
             return obj;
         }
 
+
         List<Method> chosenMethods = Arrays.stream(controller.getDeclaredMethods())
                 .filter(m -> m.getAnnotation(HateoasLink.class) != null).toList();
+
+        if (idOnly) {
+            Optional<Method> optionalMethod = chosenMethods.stream()
+                    .filter(method -> method.getAnnotation(HateoasLink.class).selfRel())
+                    .findAny();
+
+            if (optionalMethod.isEmpty()) return obj;
+
+            chosenMethods = Collections.singletonList(optionalMethod.get());
+
+        }
 
         obj.removeLinks();
 
@@ -61,7 +79,11 @@ public class LinkReferrer {
 
         return obj;
     }
-    
+
+    public static <T extends RepresentationModel<? extends T>> T doRefer(T obj){
+        return doRefer(obj, false);
+    }
+
     private static boolean hasArgAsUniqueParameter(Method method, String arg) {
         return Arrays.stream(method.getParameters())
                 .anyMatch(p -> p.getName().equals(arg))

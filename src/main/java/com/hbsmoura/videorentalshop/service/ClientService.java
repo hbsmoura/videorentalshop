@@ -1,6 +1,5 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.config.hateoas.LinkReferrer;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.ClientDto;
 import com.hbsmoura.videorentalshop.dtos.ClientLoginDto;
@@ -57,7 +56,7 @@ public class ClientService {
         ClientLoginDto clientToBeReturned = new ModelMapper().map(savedClient, ClientLoginDto.class);
         clientToBeReturned.setPassword(randomPass);
 
-        return LinkReferrer.doRefer(clientToBeReturned);
+        return clientToBeReturned;
     }
 
     /**
@@ -68,9 +67,7 @@ public class ClientService {
 
     public Page<ClientDto> listClients(Pageable pageable) {
         Page<Client> clients = clientRepository.findAll(pageable);
-        Page<ClientDto> clientsDto = clients.map(client -> new ModelMapper().map(client, ClientDto.class));
-
-        return clientsDto.map(c -> LinkReferrer.doRefer(c));
+        return clients.map(client -> new ModelMapper().map(client, ClientDto.class));
     }
 
     /**
@@ -82,9 +79,7 @@ public class ClientService {
 
     public ClientDto getClientById(UUID id) {
         Client client =  clientRepository.findById(id).orElseThrow(ClientNotFoundException::new);
-        ClientDto clientDto = new ModelMapper().map(client, ClientDto.class);
-
-        return LinkReferrer.doRefer(clientDto);
+        return new ModelMapper().map(client, ClientDto.class);
     }
 
     /**
@@ -96,9 +91,7 @@ public class ClientService {
 
     public Page<ClientDto> searchClientsByNameOrUsername(String text, Pageable pageable) {
         Page<Client> clients = clientRepository.findByNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(text, text, pageable);
-        Page<ClientDto> clientsDto = clients.map(client -> new ModelMapper().map(client, ClientDto.class));
-
-        return clientsDto.map(c -> LinkReferrer.doRefer(c));
+        return clients.map(client -> new ModelMapper().map(client, ClientDto.class));
     }
 
     /**
@@ -116,9 +109,7 @@ public class ClientService {
 
         clientRepository.save(client);
 
-        ClientDto clientDto = new ModelMapper().map(client, ClientDto.class);
-
-        return LinkReferrer.doRefer(clientDto);
+        return new ModelMapper().map(client, ClientDto.class);
     }
 
     /**

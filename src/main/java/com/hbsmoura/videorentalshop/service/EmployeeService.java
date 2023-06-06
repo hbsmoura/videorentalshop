@@ -1,6 +1,5 @@
 package com.hbsmoura.videorentalshop.service;
 
-import com.hbsmoura.videorentalshop.config.hateoas.LinkReferrer;
 import com.hbsmoura.videorentalshop.dtos.ChangePasswordDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeDto;
 import com.hbsmoura.videorentalshop.dtos.EmployeeLoginDto;
@@ -52,7 +51,7 @@ public class EmployeeService {
         EmployeeLoginDto employeeToBeReturned = new EmployeeLoginDto(savedEmployee);
         employeeToBeReturned.setPassword(randomPass);
 
-        return LinkReferrer.doRefer(employeeToBeReturned);
+        return employeeToBeReturned;
     }
 
     /**
@@ -63,9 +62,7 @@ public class EmployeeService {
 
     public Page<EmployeeDto> listEmployees(Pageable pageable) {
         Page<Employee> employees = employeeRepository.findAll(pageable);
-        Page<EmployeeDto> employeesDto = employees.map(employee -> new ModelMapper().map(employee, EmployeeDto.class));
-
-        return employeesDto.map(e -> LinkReferrer.doRefer(e));
+        return employees.map(employee -> new ModelMapper().map(employee, EmployeeDto.class));
     }
 
     /**
@@ -77,9 +74,7 @@ public class EmployeeService {
 
     public EmployeeDto getEmployeeById(UUID id) {
         Employee employee =  employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
-        EmployeeDto employeeDto = new ModelMapper().map(employee, EmployeeDto.class);
-
-        return LinkReferrer.doRefer(employeeDto);
+        return new ModelMapper().map(employee, EmployeeDto.class);
     }
 
     /**
@@ -91,9 +86,7 @@ public class EmployeeService {
 
     public Page<EmployeeDto> searchEmployeesByNameOrUsername(String text, Pageable pageable) {
         Page<Employee> employees = employeeRepository.findByNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(text, text, pageable);
-        Page<EmployeeDto> employeesDto = employees.map(employee -> new ModelMapper().map(employee, EmployeeDto.class));
-
-        return employeesDto.map(e -> LinkReferrer.doRefer(e));
+        return employees.map(employee -> new ModelMapper().map(employee, EmployeeDto.class));
     }
 
     /**
@@ -111,9 +104,7 @@ public class EmployeeService {
 
         employeeRepository.save(employee);
 
-        EmployeeDto employeeDto = new ModelMapper().map(employee, EmployeeDto.class);
-
-        return LinkReferrer.doRefer(employeeDto);
+        return new ModelMapper().map(employee, EmployeeDto.class);
     }
 
     /**
@@ -131,9 +122,7 @@ public class EmployeeService {
 
         employeeRepository.save(employee);
 
-        EmployeeDto employeeDto = new ModelMapper().map(employee, EmployeeDto.class);
-
-        return LinkReferrer.doRefer(employeeDto);
+        return new ModelMapper().map(employee, EmployeeDto.class);
     }
 
     /**
