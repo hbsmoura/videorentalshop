@@ -17,7 +17,7 @@ public class LinkReferrer {
 
     private LinkReferrer() {}
 
-    public static <T extends RepresentationModel<? extends T>> T doRefer(T obj, boolean idOnly) {
+    public static <T extends RepresentationModel<? extends T>> T doRefer(T obj, boolean selfOnly) {
         HateoasModel hateoasModelAnnotation = obj.getClass().getAnnotation(HateoasModel.class);
 
         if (hateoasModelAnnotation == null) return obj;
@@ -40,7 +40,8 @@ public class LinkReferrer {
         try {
             identity = obj.getClass()
                     .getDeclaredMethod("get" +
-                            identityFieldName.substring(0, 1).toUpperCase() + identityFieldName.substring(1)
+                            identityFieldName.substring(0, 1).toUpperCase() +
+                            identityFieldName.substring(1)
                     ).invoke(obj);
         } catch (Exception e) {
             return obj;
@@ -50,7 +51,7 @@ public class LinkReferrer {
         List<Method> chosenMethods = Arrays.stream(controller.getDeclaredMethods())
                 .filter(m -> m.getAnnotation(HateoasLink.class) != null).toList();
 
-        if (idOnly) {
+        if (selfOnly) {
             Optional<Method> optionalMethod = chosenMethods.stream()
                     .filter(method -> method.getAnnotation(HateoasLink.class).selfRel())
                     .findAny();
@@ -66,13 +67,17 @@ public class LinkReferrer {
         for (Method method : chosenMethods) {
             HateoasLink linkAnnotation = method.getAnnotation(HateoasLink.class);
 
-            WebMvcLinkBuilder linkBuilder = hasArgAsUniqueParameter(method, identityField.getName()) ?
-                    linkTo(controller, method, identity) :
-                    linkTo(controller, method);
+            Object[] params = Arrays.stream(method.getParameters()).map(parameter -> {
+                if (parameter.getName().equals(identityFieldName)) return identity;
+                return null;
+            }).toArray();
 
-            Link link = linkAnnotation.selfRel() ? linkBuilder.withSelfRel() :
-                    linkBuilder.withRel(linkAnnotation.relation());
-            link.withType(linkAnnotation.requestType());
+            WebMvcLinkBuilder linkBuilder = linkTo(controller, method, params);
+
+            Link link = (
+                    linkAnnotation.selfRel() ? linkBuilder.withSelfRel() :
+                            linkBuilder.withRel(linkAnnotation.relation())
+            ).withType(linkAnnotation.requestType());
 
             obj.add(link);
         }
@@ -84,9 +89,4 @@ public class LinkReferrer {
         return doRefer(obj, false);
     }
 
-    private static boolean hasArgAsUniqueParameter(Method method, String arg) {
-        return Arrays.stream(method.getParameters())
-                .anyMatch(p -> p.getName().equals(arg))
-                && method.getParameters().length == 1;
-    }
 }
